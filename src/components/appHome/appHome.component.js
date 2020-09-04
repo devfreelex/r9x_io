@@ -7,7 +7,7 @@ const appHome = () => {
 
     return {
         template,
-        styles
+        styles,
     }
 }
 

@@ -1,7 +1,7 @@
 import { r9x } from 'r9x_js'
-import { appMain as main } from './components/appMain.component'
-import {appHome} from './components/appHome/appHome.component'
-import { appNotFound } from './components/appNotFound.component'
+import { appMain as main } from './src/components/appMain.component'
+import {appHome} from './src/components/appHome/appHome.component'
+import { appNotFound } from './src/components/appNotFound.component'
 
 const routes = {
     firstRoute: { hash: '#/', component: appHome },

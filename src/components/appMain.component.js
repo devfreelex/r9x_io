@@ -1,14 +1,16 @@
-import { store } from '../store'
+
+import {appHeader} from './appHeader/appHeader.component'
 
 const appMain = () => {
 
-    const state = store.get()
-
-    const children = () => ({})
+    const children = () => ({
+        appHeader
+    })
 
     const template = ({state, props}) => {
         return /*html*/`
             <div class="app-main-wrapper">
+                <app-header></app-header>
                 <router-view></router-view>
             </div>
         `
@@ -16,6 +18,7 @@ const appMain = () => {
 
     const styles = () => {
         return /*css*/`
+
            app-main {
             display: block;
             float: left;
@@ -31,7 +34,6 @@ const appMain = () => {
     })
 
     return {
-        state,
         template,
         styles,
         hooks,
