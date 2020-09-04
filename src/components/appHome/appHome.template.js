@@ -1,5 +1,11 @@
 export default ({props, state}) => /*html*/`
     <div class="home-wrapper">
-        <h1>Home</h1>
+        <div class="container">
+            <app-title 
+                data-props="{'title':'Apresentação', 'type':'mini'}"
+            >
+            </app-title>        
+        </div>
+
     </div>
 `

@@ -5,7 +5,7 @@ const appMenu = () => {
 
     const state = {
         menuList: [
-            {label: 'Apresentação', link:'#/presentation'},
+            {label: 'Apresentação', link:'#/'},
             {label: 'Tutorial', link:'#/tutorial'}
         ]
     }
