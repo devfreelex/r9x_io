@@ -7,9 +7,10 @@ export default () => /*css*/ `
         line-height:45px;
         text-align:center;
         color: #9c29dc;
+        font-weight:bold
     }
 
     .logo-wrapper i {
-        font-size: 1.2em
+        font-size: .9em
     }
 `

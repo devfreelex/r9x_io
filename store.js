@@ -60,7 +60,7 @@ const routes = {
     firstRoute: { hash: '#/', component: appHome },
     defaultRoute: { hash: '#/404', component: appNotFound },
     otherRoutes: [
-        { hashExp: /^\#\/$/, component: appHome },
+        { hashExp: /^\#\\/$/, component: appHome },
     ]
 }
 
@@ -80,7 +80,7 @@ const routes = {
     firstRoute: { hash: '#/', component: appHome },
     defaultRoute: { hash: '#/404', component: appNotFound },
     otherRoutes: [
-        { hashExp: /^\#\/$/, component: appHome },
+        { hashExp: /^\#\\/$/, component: appHome },
     ]
 }                            
                             `

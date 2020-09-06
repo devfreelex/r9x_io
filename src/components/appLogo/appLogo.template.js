@@ -1,5 +1,5 @@
 export default ({props, state}) => /*html*/ `
     <div class="logo-wrapper">
-        <i class="las la-eraser"></i> <span class="title">Plug.js</span>
+        <i class="las la-sync"></i> <span class="title">R9X</span>
     </div>
 `
