@@ -1,8 +1,8 @@
 export default ({props, state, methods}) => {
 
-    const { sections } = state
+    const { introduction } = state
 
-    const tpl = sections.map((section) => {
+    const tpl = introduction.sections.map((section) => {
 
         let sectionTitle = ''
         let sectionTagline = ''
