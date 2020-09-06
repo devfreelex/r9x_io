@@ -1,26 +1,26 @@
 export default () => /*css*/ `
-    app-home .home-wrapper {
+    app-view .home-wrapper {
         display:block;
         float:left;
         width:100%
     }
 
-    app-home .container {
+    app-view .container {
         display:block;
         width:100%;
         max-width:1180px;
         margin:0 auto;
-        padding:15px;
+        padding-top:15px;
     }
 
-    app-home .container::after {
+    app-view .container::after {
         content:'';
         display:block;
         width:100%;
         clear:both;
     }
 
-    app-home .tagline {
+    app-view .tagline {
         display: block;
         float: left;
         width: 100%;
@@ -34,7 +34,7 @@ export default () => /*css*/ `
         font-weight: 900;
     }
 
-    app-home .paragraph {
+    app-view .paragraph {
         display:block;
         float:left;
         width:100%;

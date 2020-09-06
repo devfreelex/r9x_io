@@ -1,6 +1,6 @@
 
-import styles from './appContent.styles'
-import template from './appContent.template'
+import styles from './appCode.styles'
+import template from './appCode.template'
 
 import hljs from 'highlight.js/lib/core';
 import javascript from 'highlight.js/lib/languages/javascript';

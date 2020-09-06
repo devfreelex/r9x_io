@@ -437,7 +437,40 @@ const appHelloWorld = () => {
 
         ]        
     },
-    store: {}
+    store: {
+        sections: [
+            {
+                title: 'Store',
+                tagline: 'Observable Store, simples e eficiente.',
+                articles: [
+                    {
+                        title: 'Compartilhando dados observaveis',
+                        paragraphs: [
+                            {
+                                text: '',
+                                code: ''
+                            }
+                        ]
+                    }
+                ]                
+            },            
+            {
+                title: '',
+                tagline: '',
+                articles: [
+                    {
+                        title: '',
+                        paragraphs: [
+                            {
+                                text: '',
+                                code: ''
+                            }
+                        ]
+                    }
+                ]                
+            }            
+        ]
+    }
 })
 
 export { store }
