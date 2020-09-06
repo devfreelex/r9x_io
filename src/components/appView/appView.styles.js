@@ -1,8 +1,9 @@
 export default () => /*css*/ `
-    app-view .home-wrapper {
+    app-view .view-wrapper {
         display:block;
         float:left;
-        width:100%
+        width:100%;
+        padding-bottom:45px;
     }
 
     app-view .container {

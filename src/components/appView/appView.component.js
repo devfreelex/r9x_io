@@ -2,7 +2,9 @@ import template from './appView.template'
 import styles from './appView.styles'
 
 import { store } from '../../../store'
+
 import { appTitle } from '../appTitle/appTitle.component'
+import { appCode } from '../appCode/appCode.component'
 
 const appView = () => {
 
@@ -10,6 +12,7 @@ const appView = () => {
 
     const children = () => ({
         appTitle,
+        appCode
     })
 
     const methods = () => ({

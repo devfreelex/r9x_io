@@ -10,7 +10,7 @@ import '../../assets/editor.theme.css'
 
 
 
-const appContent = () => {
+const appCode = () => {
 
     const hooks = ({ methods }) => ({
         afterOnInit () {
@@ -37,4 +37,4 @@ const appContent = () => {
     }
 }
 
-export { appContent }
+export { appCode }

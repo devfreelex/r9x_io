@@ -447,23 +447,131 @@ const appHelloWorld = () => {
                         title: 'Compartilhando dados observaveis',
                         paragraphs: [
                             {
-                                text: '',
-                                code: ''
+                                text: 'Uma store de dados é apenas um objeto observável.',
+                            },
+                            {
+                                text: 'Para criar uma nova store, basta importar storeFactory e fornecer para a função fábrica o objeto de dados a ser observado.',
+                                code:`
+import { storeFactory } from 'r9x_js'
+
+const store = storeFactory({
+    title:'New Store'
+})
+
+export { store }
+                                `
+                            },
+                        ]
+                    },
+                    {
+                        title:'Reagindo a mutações',
+                        paragraphs: [
+                            {
+                                text: 'Para reagir as mutações nos dados de uma store, um componente precisa se inscrever para ouvir suas mutações.',
+                                code: `
+import { store } from 'another/place/store'
+
+const appTitle = () => {
+
+    const state = store.get()
+
+    const template = ({props, state}) => {
+        return /*html*/ \`< h1 > \${state.title} < /h1 >\`
+    }
+
+    const styles = () => /*css*/ \`
+        h1 { color: blue }
+    \` 
+
+    const hooks = () => ({
+
+        beforeOnInit () {
+            store.subscribe((payload) => {
+                state.set(payload)
+            })
+        }
+
+    })
+
+    return {
+        state,
+        template,
+        styles,
+        hooks
+    }
+}                                
+                                `
+                            },
+                            {
+                                text: 'No trecho de código acima, temos várias coisas acontecendo. Mas, note que uma store foi importada dentro do arquivo do componente.',
+                                code:`
+import { store } from 'another/place/store'
+
+const appTitle () => { /*codigo omitido*/ }
+                                `
+                            },
+                            {
+                                text:'Em seguida, o componente obtem os dados da store e armazena no state local.',
+                                code:`
+import { store } from 'another/place/store'
+
+const appTitle () => { 
+    
+    const state = store.get()
+
+    /*codigo omitido*/ 
+
+}                                
+                                `
+                            },
+                            {
+                                text:'Observe que nas próximas linhas, o componente se inscreve para ouvir as mutações da store e reagir a elas aproveitando-se do hook beforeOnInit. Assim, sempre que a store for alterada, os state local e o template do componente serão atualizados.',
+                                code:`
+import { store } from 'another/place/store'
+
+const appTitle () => { 
+    
+    const state = store.get()
+
+    /*codigo omitido*/ 
+
+    const hooks = () => ({
+
+        beforeOnInit () {
+            store.subscribe((payload) => state.set(payload))
+        }
+
+    })
+    
+    /*codigo omitido*/
+
+}                                  
+                                `
+                            },
+                            {
+                                text:'Olhando com mais profundidade, você notará que o método subscribe da store recebe um callback. Esse callback será executado sempre que a store mudar. O mais interessante é que sempre que o callback é executado, o mesmo recebe os novos dados da store através do parametro payload. Dessa forma, através do metodo state.set() é possível atualizar os dados do state local do componente fazendo com que o mesmo atualize o seu template para exibir as informações atualizadas. Veja abaixo:',
+                                code:`
+/*Código omitido*/
+store.subscribe((payload) => state.set(payload))
+/*Código omitido*/
+                                `
                             }
                         ]
                     }
                 ]                
             },            
             {
-                title: '',
-                tagline: '',
+                title: 'Conclusão',
+                tagline: 'Simplicidade é a palavra chave!',
                 articles: [
                     {
-                        title: '',
+                        title: 'Justificando o padrão observable store',
                         paragraphs: [
                             {
-                                text: '',
-                                code: ''
+                                text: 'R9X adota o padrão de dados observáveis para simplificar o processo de desenvolvimento de aplicações reais. Dessa forma, um componente pode se inscrever para ouvir mudanças somente nos dados que importam.',
+                            },
+                            {
+                                text: 'Bem isso é tudo sobre observable store. Mas, seria interessante ir para a próxima sessão "tutorial" para por em prática todos os recursos detalhados até esse ponto.'
                             }
                         ]
                     }
