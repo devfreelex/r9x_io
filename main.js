@@ -4,6 +4,7 @@ import { appMain as main } from './src/components/appMain.component'
 import {appHome} from './src/components/appHome/appHome.component'
 import { appNotFound } from './src/components/appNotFound.component'
 import { appStore } from './src/components/appStore/appStore.component'
+import { appTutorial } from './src/components/appTutorial/appTutorial.component'
 
 const routes = {
     firstRoute: { hash: '#/', component: appHome },
@@ -11,6 +12,7 @@ const routes = {
     otherRoutes: [
         { hashExp: /^\#\/$/, component: appHome },
         { hashExp: /^\#\/store$/, component: appStore },
+        { hashExp: /^\#\/tutorial$/, component: appTutorial },
     ]
 }
 

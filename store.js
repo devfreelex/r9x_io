@@ -578,6 +578,82 @@ store.subscribe((payload) => state.set(payload))
                 ]                
             }            
         ]
+    },
+    tutorial: {
+        sections: [
+            {
+                title: 'Tutorial',
+                tagline: 'Aplicando r9x para construtir um gerenciador de locação de filmes.',
+                articles: [
+                    {
+                        title: 'Introdução',
+                        paragraphs: [
+                            {
+                                text: 'Esse tutorial aborda a construção de um gerenciador de locação de filmes de forma direta, afim de otimizar o tempo necessário para construir o app e aprender r9x.',
+                            },
+                            {
+                                text: 'A partir da próxima sessão você pode acompanhar a construção passo-a-passo do app e poderá entender os conceitos e recursos necessários para desenvolver aplicações com r9x.',
+                            },
+                        ],
+                    },
+                    {
+                        title: 'Mão na massa!',
+                        paragraphs: [
+                            {
+                                text: 'O primeiro passo para desenvolver a aplicação proposta é definir a base do projeto. Utilizaremos "degit" para clonar o repositório r9x_tutorial, pois essa é a forma mais rápida para criar a estrutura do projeto.',
+                            },
+                            {
+                                text: 'A ferramenta "degit" é um módulo diponível nos repositórios do npm. Seu trabalho é clonar repositórios git sem rastreamento. Isso significa que você pode clonar rapidamente r9x_tutorial e em seguida definir suas próprias configurações de versionamento.',
+                            },
+                            {
+                                text: 'Para instalar "degit" no linux utilize o comando abaixo ou pesquise por degit no site do npm para mais instruções.',
+                                code:'sudo npm install degit -g'
+                            },
+                            {
+                                text:'Para clonar o projeto, crie uma nova pasta, um nome sugestivo é "movie-manager" abra a pasta no terminal e digite:',
+                                code:'degit github:devfreelex/r9x_tutorial'
+                            },
+                            {
+                                text:'Pronto, a estrutura do projeto já foi criada ou clonada.'
+                            },
+                            {
+                                text: 'Observe que temos a seguinte estrutura de arquivos e diretórios:'
+                            },
+                            {
+                                code: `
+src
+|_ assets
+|_ components
+|_ main.js
+index.html
+package.json
+                                `
+                            }, 
+                            {
+                                text:'Na raiz do projeto está o arquivo index.html reponsável por carregar o arquivo main.js que contém as configurações básicas para inicialização do projeto.'
+                            },
+                            {
+                                text:'Ainda na raiz do projeto, está o arquivo package.json, esse arquivo contém as confgurações de depências do projeto e comandos específicos para rodá-lo em ambiente de desenvolvimento e produção.'
+                            },
+                            {
+                                text:'Dentro da pasta src fica a pastas assets, que contém arquivos de estilização. Esses arquivos já estão prontos para uso. Ainda em src está a pasta components, que deve conter os componentes da aplicaçao.'
+                            },
+                            {
+                                text:'Para finalizar essa sessão, execute no terminal o comano abaixo:',
+                                code:`npm install`
+                            },
+                            {
+                                text:'Esse comando instalará todas as dependências do projeto. Após a instalação ser concluída inicialize a aplicação em modo de desenolvimento executando o comando:',
+                                code:'npm run dev'
+                            },
+                            {
+                                text:'Pronto, para ver o resultado acesse em um navegador, de preferência no chrome a url: http://localhost:3000. Se tudo deu certo a aplicação deve mostrar na tela um "Hello World!".'
+                            }
+                        ],
+                    },
+                ]
+            },            
+        ]
     }
 })
 
