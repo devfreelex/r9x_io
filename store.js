@@ -648,9 +648,385 @@ package.json
                             },
                             {
                                 text:'Pronto, para ver o resultado acesse em um navegador, de preferência no chrome a url: http://localhost:3000. Se tudo deu certo a aplicação deve mostrar na tela um "Hello World!".'
+                            },
+                            {
+                                text:'A partir da próxima sessão, criaremos o bootstrap e os componentes do gerenciador de locação de filmes.'
                             }
                         ],
                     },
+                    {
+                        title:'Bootstrap da aplicaçao',
+                        paragraphs:[
+                            {
+                                text:'Dentro do arquivo main.js defina o código abaixo:',
+                                code:`
+import { r9x } from 'r9x_js'
+
+const routes = {}
+
+const app = r9x()
+
+app.use({
+    main,
+    routes,
+})
+
+app.init()                                
+`
+                            },
+                            {
+                                text:'No trecho de código acima, importamos r9x como uma dependência e criamos o objeto de rotas ("routes").'
+                            },
+                            { 
+                                text: 'Na sequencia, executamos r9x que retorna para a variável app, dois métodos auxiliares para adicionar recursos ao projeto e inicializar a aplicaçao. Esses metodos são "use" e "init" respectivamente.'
+                            },
+                            {
+                                text:'Agora observe que passamos os objetos routes e main para o método use, mas, perceba que main não existe ainda.'
+                            },
+                            {
+                                text: 'Para r9x o componente principal da aplicação tem um nome padrão, esse nome é main. Então, vamos importar esse componente agora, caso contrário ao atualizar a página da aplicação obteremos um erro.'
+                            },
+                            {
+                                text:'Para fins didáticos, o componente main.js assim como o componente appNotFound, foi préviamente criado para este tutorial. Portanto, vamos importálos agora.',
+                                code:`
+import { appMain as main } from './components/appMain.component'
+import { appNotFound } from './components/appNotFound.component'
+
+`
+                            },
+                            {
+                                text:'Aproveitando o momento, vamos também definir as configurações para as rotas de navegação.',
+                                code:`
+const routes = {
+    firstRoute: { hash: '#/', component: appHome },
+    defaultRoute: { hash: '#/404', component: appNotFound },
+    otherRoutes: [
+        { hashExp: /^\#\/$/, component: appHome },
+        { hashExp: /^\#\/user\/\d+$/, component: appUserDetail },
+    ]
+}                                
+                                `
+                            },
+                            {
+                                text: 'O objeto de rotas é composto por três chaves, "firstRoute", "defaultRoute" e "otherRoute".'
+                            },
+                            {
+                                text: 'A chave firstRoute define a rota inicial da aplicação  e o componente a ser carregado para essa rota através do objeto interno e suas propriedades "hash" e "component".',
+                                code: `
+firstRoute: { hash: '#/', component: appHome },                                
+                                `
+                            },
+                            {
+                                text: 'A chave defaultRoute segue a mesma lógica, mas, define uma rota a ser carregada apenas quando uma rota não existente for acessada na aplicação. Nesse caso, o componente a ser carregado na rota padrão e o appNotFound.',
+                                code:`
+defaultRoute: { hash: '#/404', component: appNotFound },                                
+                                `
+                            },
+                            {
+                                text: 'A chave otherRoutes também segue a mesma lógica, porém, carrega componentes para rotas existentes sempre que ocorre uma mudança na url do navegador. Observe ainda que o objeto interno dessa propriedade não possui a propriedade hash e sim a propriedade hashExp que é uma expressão regular ao contrário da propriedade hash que armazena uma string.',
+                                code:`
+otherRoutes: [
+    { hashExp: /^\#\/$/, component: appHome },
+    { hashExp: /^\#\/user\/\d+$/, component: appUserDetail },
+]                                
+                                `
+                            },
+                            {
+                                text: ' A substituição de hash para hashExp é necessária para verificar se a rota acessada é válida e uma das melhores formas para fazer isso é usando expressõo regular. Então sim, as rotas em r9x são baseadas em expressões regulares.'
+                            },
+                            {
+                                text: 'O código completo fica assim:',
+                                code:`
+import { r9x } from 'r9x_js'
+import { appMain as main } from './components/appMain.component'
+import { appHome } from './components/appHome/appHome.component'
+import { appNotFound } from './components/appNotFound.component'
+
+import './assets/styles/reset.css'
+import './assets/styles/main.css'
+
+const routes = {
+    firstRoute: { hash: '#/', component: appHome },
+    defaultRoute: { hash: '#/404', component: appNotFound },
+    otherRoutes: [
+        { hashExp: /^\#\/$/, component: appHome },
+    ]
+}
+
+const app = r9x()
+
+app.use({
+    main,
+    routes,
+})
+
+app.init()                                
+                                `
+                            },
+                            {
+                                text:'Ainda obteremos um erro ao executar a aplicação, pois, o component appHome definido para a rota inicial ainda não existe. Então o criaremos na próxima sessão.'
+                            }
+                        ]
+                    },
+                    {
+                        title:'Components',
+                        paragraphs:[
+                            {
+                                text:'Componentes para r9x são apenas factory functions que retornam um objeto contendo as propriedades de um componente.',
+                            },
+                            {
+                                text:'Vamos criar o componente appHome. Por isso, dentro da pasta components crie a pasta appHome e dentro dela os arquivos:',
+                                code: `
+appHome.component.js
+appHome.template.js
+appHome.styles.js                                
+                                `
+                            },
+                            {
+                                text: 'Os sufixos .component, .template, .styles são bem descritivos. Está claro a responsabilidade de cada arquivo do componente.'
+                            },
+                            {
+                                text:'Dentro do arquivo appHome.component.js insira o código abaixo:',
+                                code:`
+//apHome.component.js
+                                
+import template from './appHome.template.js'
+import styles from './appHome.styles.js'
+
+const appHome = () => {
+    
+    return  {
+        template,
+        styles
+    }
+
+}
+
+export { appHome }
+                                `
+                            },
+                            {
+                                text:'Observe que o componente tem duas dependências, o template e seus estilos. Precisamos definir a função de template e de estilos. Criaremos agora o template.',
+                                code: `
+//appHome.template.js                                
+
+    export default ({props, state}) => {
+        return /*html*/ \`< h1 > appHome < /h1 >\`
+    }
+                                `
+                            },
+                            {
+                                text:'Observe que a função que define o template recebe um parâmetro, do qual extrai propriedades (props) e dados (state) que mais tarde podem ser utilizados pelo template.'
+                            },
+                            {
+                                text:'Hora de criar os estilos.',
+                                code:`
+//appHome.styles.js
+
+export default () => /*css*/ \` 
+    app-home h1 { color: blue }
+\`                                
+                                `
+                            },
+                            {
+                                text:'Veja, os estilos são retornados por uma função simples. Note que o seletor app-home foi utilizado para definir o escopo de aplicação do estilo css. Como para r9x o nome do componente é a propriedade name da função fábrica que o define e elementos customizados no html5 possuem um tagName separado por "-", o seletor do componente depois do parse do seu nome ser aplicado torna-se app-home.'
+                            },
+                            {
+                                text:'Quando o componente for carregado e a aplicação inicializar, será criado a tag app-home como elemento do componente. Portanto, somente os elementos html filhos de app-home sofrerão modificações visuais decorrente do estilo css aplicado.'
+                            },
+                            {
+                                text: 'Esse é um padrão css simples que resolvem muitos problemas de escopo de estilização.'
+                            },
+                            {
+                                text:'Pronto, agora o componente appHome importado em main.js será carregado e renderiado corretamente através do roteador da biblioteca.',
+                                code: `
+//main.js
+
+/*...codigo omitido...*/
+import { appHome } from './components/appHome/appHome.component'
+
+/*...codigo omitido... */
+
+const routes = {
+    firstRoute: { hash: '#/', component: appHome },
+    defaultRoute: { hash: '#/404', component: appNotFound },
+    otherRoutes: [
+        { hashExp: /^\#\\/$/, component: appHome },
+    ]
+}
+
+/*...codigo omitido...*/                                
+                                `
+                            },
+                            {
+                                text:'Alterne para o navegador e veja o resultado. Se tudo deu certo, agora a página principal (home) exibe o título appHome.'
+                            }
+                        ]
+                    },
+                    {
+                        title:'Componentes reaproveitáveis',
+                        paragraphs: [
+                            {
+                                text: 'A partir desse ponto, a coisa começa a ficar mais séria. Precisamos pensar em reaproveitamento de código. Podemos usar como exemplo o título presente em appHome, ele poderia ser um outro componente e receber o texto do título através de propriedades reativas. Vamos fazer isso agora.',
+                            },
+                            {
+                                text: 'Crie dentro da pasta componentes a pasta appTitle e dentro dela os arquvivos do componente de título.',
+                                code:`
+appTitle.component.js
+appTitle.template.js
+appTitle.styles.js                                
+                                `
+                            },
+                            {
+                                text:'Hora de implementar o template do componente. Utilize o código abaixo:',
+                                code: `
+//appTitle.template.js
+
+export default ({props, state}) => /*html*/ \`
+<div class="title-wrapper">
+        < h1 class="title \${props.object.style ? props.object.style : ''}" >\${props.object.title}< /h1 >
+    </div>
+\`
+
+`
+                            },
+                            {
+                                text: 'Observe o seguinte treco de código:',
+                                code: `
+< h1 class="title \${props.object.style ? props.object.style : ''}" >\${props.object.title}< /h1 >
+                                `
+                            },
+                            {
+                                text:'Estamos acessando as propriedades reativas através do objeto props que as contém. Observe que esse objeto possui a propriedade object que disponibiliza as propriedades como um objeto. Nesse caso estamos acessando, a propriedade title do objeto object.',
+                            },
+                            {
+                                text: 'No momento é assim que r9x converte um texto simples em propriedades reativas. Essas propriedades serão fornecidas para o template através da tag do componente definida dentro dos templates de outros componentes. Logo mais veremos isso em prática.'
+                            },
+                            {
+                                text:'Ainda observando o trecho acima, note que a avaliação dentro da propriedade html class verifica se um estilo customizado foi informado como propriedade. Em caso afirmativo esse estilo será aplicado, caso contrário nada ocorre. Isso nos permite definir multiplos estilos visuais para o componente. Dessa forma a interface do componente pode se comportar de maneira diferente dependendo de onde ele for instanciado e de acordo com o estilo fornecido para o template como propriedade. '
+                            },
+                            {
+                                text:'Hora de definir os estilos do template. Utilize o código abaixo:',
+                                code:`
+//appTitle.styles.js
+
+export default () => /*css*/ \`
+    app-title .title-wrapper {
+        margin-bottom:15px;
+    }
+    app-title .title-wrapper,
+    app-title .title {
+        display:block;
+        float:left;
+        width:100%;
+    }
+
+    app-title .title {
+        padding:15px;
+        border-bottom: 1px #ebebeb solid;
+        font-size: 1.2em;
+        text-transform: uppercase;
+        text-align:left;
+    }
+
+    app-title .white { background:#fff; color: #6c31bf}
+    app-title .purple { background:#6c31bf; color:#fff;}
+\`                                
+                                `
+                            },
+                            {
+                                text:'O bloco acima não tem segredos. Definimos a estilização padrão e dois temas que serão aplicados se um estilo customizado for fornecido como propriedade para o template do componente. Falavamos disso, instantes através. Esses temas são "white & purple, definidos nas duas últimas linhas de css dos estilos do componente.'
+                            },
+                            {
+                                text:'Hora de juntar tudo e definir o arquivo principal do componente.',
+                                code:`
+//appTitle.component.js
+
+import template from './appTitle.template'
+import styles from './appTitle'
+
+const appTitle = () => {
+    return {
+        template,
+        styles
+    }
+}
+
+export {
+    appTitle
+}                                
+                                `
+                            },
+                            {
+                                text:'Perceba que apenas importamos o template e os estilos dentro de appTitle.component.js, e os retornamos através da factory appTitle. Por fim, expotamos a função construtora appTitle que agora pode ser importada pelo componente appHome.',
+                                code:`
+//appHome.compnente.js
+
+import template from './appHome.template'
+import styles from './appHome.styles'
+
+import { appTitle } from '../appTitle/appTitle.component'
+
+import { store } from '../../store'
+
+const appHome = () => {
+
+    const children = () => ({
+        appTitle,
+    })
+
+    return {
+        template,
+        styles,
+        children,
+    }
+    
+}
+
+export { appHome }                                
+                                `
+                            },
+                            {
+                                text:'Algumas coisas estão diferentes no componente appHome. Primeiro appTitle foi importado:',
+                                code:`
+import { appTitle } from '../appTitle/appTitle.component'
+
+`
+                            },
+                            {
+                                text:'Em seguida uma nova função (children) foi inserida dentro de appHome e esta função retornando um objeto que contém appTitle.',
+                                code:`
+    const children = () => ({
+        appTitle,
+    })                                
+                                `
+                            },
+                            {
+                                text:'Por fim, essa função children está sendo retornada junto com o template e seus estilos para factory appHome:',
+                                code:`
+    return {
+        template,
+        styles,
+        children,
+    }                                
+                                `
+                            },
+                            {
+                                text:'Quase tudo em r9x são factory functions. Children é uma fábrica que retorna os componentes filhos para serem instancidos através do componente pai. Nesse caso específico, appTitle passa a ser filho de appHome. Por isso, children foi inserida no escopo do componente e retornada como uma propriedade pela factory function appHome. É dessa forma que componenetes filhos são definidos em r9x.'
+                            },
+                            {
+                                text: 'Uma vez definido um compnente filho através de children, o componente pai vai procurar em seu template a tag do componente filho para intanciá-lo. Para cada tag do componente filho encontrada no template do componente pai, uma nova instância do componente filho será criada e relacionada. Veja abaixo:',
+                                code:`
+//appHome.template.js
+
+export default ({props, state}) => /*html*/ \`
+    < app-title data-props="\{'title':'Vitrine', 'style':'purple'\}" >< \/app-title >
+\`
+
+`
+                            }
+                        ]
+                    }
                 ]
             },            
         ]
