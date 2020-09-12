@@ -788,7 +788,7 @@ appHome.styles.js
                             {
                                 text:'Dentro do arquivo appHome.component.js insira o código abaixo:',
                                 code:`
-/*appHome.template.js*/
+/*appHome.component.js*/
                                 
 import template from './appHome.template.js'
 import styles from './appHome.styles.js'
@@ -1087,6 +1087,954 @@ export default () => /*css*/ \`
     }
 \`
 `
+                            }
+                        ]
+                    },
+                    {
+                        title:'Buscas - appSearch',
+                        paragraphs: [
+                            {
+                                text:'Essa aplicação exibirá através do componente appHome uma lista de filmes e clientes. Por isso, precisamos de uma forma eficiente para filtrar os filmes e os clientes e tornar mais fácil a vida do usuário que vai operar o app.'
+                            },
+                            {
+                                text:'Destro da pasta components crie os arquivos:',
+                                code:`
+appSearch.component.js
+appSearch.template.js
+appSearch.stylessss.js
+                                
+`
+                            },
+                            {
+                                text:'Comece implementando o template do componente.',
+                                code:`
+/*appSearch.template.js*/
+
+export default ({props, state}) => /*html*/ \`
+    <div class="search-wrapper">
+        <input type="text" class="search-input" placeholder="\${props.object.placeholder}">
+    </div>
+\`                                
+`
+                            },
+                            {
+                                text:'Note que o template acessa a propriedade reativa "placeholder", essa propriedade define o placeholder do input da busca.'
+                            },
+                            { 
+                                text:'Hora de definir os estilos do componente. O código css fica assim:',
+                                code:`
+export default () => /*css*/ \`
+    app-search .search-wrapper {
+        display:block;
+        float:left;
+        width:100%;
+        padding:15px;
+        margin-bottom:15px;
+        border-radius:4px;
+        background:#f9f9f9;
+    }
+
+    app-search .search-input {
+        display:block;
+        float:left;
+        width:100%;
+        padding:15px;
+        border:0;
+        border-bottom:2px #fff solid;
+        border-radius:4px;
+        outline:0;
+        background:#fff;
+        color:#666;
+        text-transform: uppercase;
+        font-size:.875em
+    }
+
+    app-search .search-input:focus {
+        border-bottom: 2px #ebebeb solid;
+    }
+\`
+`
+                            },
+                            {
+                                text:'Não há segredos aqui. Esse é apenas um estilo css que você poderia escrever para formatar qualquer input de texto.'
+                            },
+                            {
+                                text:'Agora importe o template e os estilos dentro de appSearch.component.js, o códgo fica assim:',
+                                code:`
+/*appSearch.component.js*/
+
+import template from './appSearch.template.js'
+import styles from './appSearch.styles.js'
+
+const appSearch = () => {
+
+    return {
+        template,
+        styles
+    }
+
+}
+
+export { appSearch }
+
+`
+                            },
+                            {
+                                text:'É preciso implementar uma forma para o usuário interagir com o componente e realizar a filtragem dos dados. É possível fazer isso utilizando eventos. Veja o código:',
+                                code:`
+    const events = ({on, query, methods, directives}) => ({
+        onType () {
+            const input = query('.search-input')
+            let value = ''
+
+            on('keyup', [input], ({target}) => { 
+                if(target.value) value = target.value
+                methods.filterMovies({target})
+            })
+        }
+    })
+
+    `
+                            },
+                            {
+                                text:'A factory events acima está criando um manipulador de eventos denominado onType. Ao ser executado após a renderização do template o evento será aplicado a tag alvo.'
+                            },
+                            {
+                                text:'A factory events recebe um parâmtro que dá acesso a alguns itens importantes. Esses itens são:',
+                                code:`
+/*html*/
+on: Função responsável por fazer o bind de eventos
+query: Função responsável por buscar elementos no contexto do componente
+methods: Um objeto contendo todos os métodos do componente
+directives: Um objeto contendo todas as diretivas relacionadas ao componente
+
+`
+                            },
+                            {
+                                text:'Com os recursos acima podemos buscar elementos e adicionar eventos executando métodos do componente sempre que um desses eventos ocorrer. E exatamente isso que está acontecendo no código abaixo:',
+                                code:`
+onType () {
+    const input = query('.search-input')
+    let value = ''
+
+    on('keyup', [input], ({target}) => { 
+        if(target.value) value = target.value
+        methods.filterMovies({target})
+    })
+
+}
+                                `
+                            },
+                            {
+                                text:'Primeiro, através da função query, obtemos o elemento do input. Em seguida declaramos value que armazenará o cache do valor digitado no input. Depois através da função on, o evento keyup é definido. Observe que o input selecionado é passado para essa função dentro de um array. Isso porque on manipula uma série de elementos de uma única vez. Em seguida é passado um callback para on que obtem o target do evento e armazena o valor da propriedade value do target dentro da variável de cache value. Por fim, o método filterMovies recebe o target e realiza a filtragem dos dados.'
+                            },
+                            {
+                                text:'Óbvio, esse código não funciona ainda. Precisamos dicionar o método filterMovies. O código fica assim:',
+                                code:`
+const methods = ({props, state}) => ({
+
+    filterMovies ({target}) {
+        const { storeKey } = props.get().object
+        const { value } = target
+        const regex = new RegExp(\`\${ value }\`,'ig')
+
+        const result = store.get()[storeKey].filter( item => {
+            const itemKeys = Object.keys(item)
+            return itemKeys.filter(key => item[key].toString().match(regex)).join('')
+        })
+
+        store.update((storeData) => {
+            if(!storeData.hasOwnProperty('search')) storeData.search = {}
+            storeData.search[storeKey] = result
+        })
+
+    }
+})
+                                `
+                            },
+                            {
+                                text:'Primeiro adicionamos a factory de métodos "methods". Essa factory recebe um parâmetro contendo a propriedades reativas e o state local do componente.',
+                                code: `
+const methods = ({props, state}) => ({ })
+                                `
+                            },
+                            {
+                                text:'Declaramos no objeto retornado os métodos que vão decorar o componente. Por causa do clousure esses métodos possuem acesso a props e state.',
+                                code:`
+/*codigo omitido*/
+
+{
+    filterMovies ({target}) { }
+}
+                                `
+                            },
+                            {
+                                text:'Dentro de filterMovies, obtemos a proriedade storeKey para selecionar a chave de dados a ser filtrada na store de dados que ainda não existe e precisa ser criada. Em seguida, value é extraído do target recebido como parametro. Por fim, value é transformado em uma expressão regular.',
+                                code:`
+const { storeKey } = props.get().object
+const { value } = target
+const regex = new RegExp(\`\${ value }\`,'ig')                                
+                                `,
+                            },
+                            {
+                                text:'Observe o treche a seguir:',
+                                code: `
+                                
+const result = store.get()[storeKey].filter( item => {
+    const itemKeys = Object.keys(item)
+    return itemKeys.filter(key => item[key].toString().match(regex)).join('')
+})
+
+`
+                            },
+                            {
+                                text:'O código acima acessa a chave da store dedados assim:',
+                                code:`
+store.get()[storeKey]
+
+`
+                            },
+                            {
+                                text:'Então, filter percode os objetos da chave selecionada na store:',
+                                code: `
+store.get()[storeKey].filter( item => {
+
+})                                
+`
+                            },
+                            {
+                                text:'Por fim, caso a expressão regular avaliadora teste true para os objetos dentro da chave selecionada na store, filter retorna um array contendo esses objetos.',
+                                code: `
+const itemKeys = Object.keys(item)
+return itemKeys.filter(key => item[key].toString().match(regex)).join('')                                
+
+`
+                            },
+                            {
+                                text:'Observe o seguinte código:',
+                                code:`
+store.update((storeData) => {
+    if(!storeData.hasOwnProperty('search')) storeData.search = {}
+    storeData.search[storeKey] = result
+}) 
+
+`
+                            },
+                            {
+                                text:'O método update da store, recebe um callback que tem acesso aos dados da store e permite atualizá-los e notificar a todos os observadores da store.',
+                                code: `
+store.update((storeData) => { })
+
+`
+                            },
+                            {
+                                text:'No calback passado para update está sendo avaliado se existe a chave search na store. Se essa chave não existir, será criada dinâmicamente e em seguida a ela será abribuido o resultado a busca.',
+                            code:`
+if(!storeData.hasOwnProperty('search')) storeData.search = {}
+storeData.search[storeKey] = result
+                                `
+                            },
+                            {
+                                text:'Chegou o momento de criar a store, pois, logo a diante será necessário observar as mudanças nos ddos da store para atualizar o state local dos componentes da aplicação.'
+                            },
+                            {
+                                text:'Na raiz do projeto crie o arquivo store.js e insira dentro o código abaixo:',
+                                code:`
+import { storeFactory } from 'r9x_js'
+
+const store = storeFactory({
+    movieList: [
+        { id: 1, title: 'Ultimos dias', description:'Mussum Ipsum, cacilds vidis litro abertis. Tá deprimidis, eu conheço uma cachacis que pode alegrar sua vidis. Quem num gosta di mé,'},
+        {id:2, title:'Fim dos dias', description:'Mussum Ipsum, cacilds vidis litro abertis. Tá deprimidis, eu conheço uma cachacis que pode alegrar sua vidis. Quem num gosta di mé,'},
+        {id:3, title:'Málevola', description:'Mussum Ipsum, cacilds vidis litro abertis. Tá deprimidis, eu conheço uma cachacis que pode alegrar sua vidis. Quem num gosta di mé,'},
+        {id:4, title:'A rainha má', description:'Mussum Ipsum, cacilds vidis litro abertis. Tá deprimidis, eu conheço uma cachacis que pode alegrar sua vidis. Quem num gosta di mé,'},
+    ],
+    userList: [
+        { id: 1, name: 'Rodrigo', lastName:'Rocha', cpf:'9995586655', movies:[] },
+        { id: 2, name: 'Roberto', lastName:'Montana', cpf:'6665544788', movies:[] },
+        { id: 3, name: 'Rafaela', lastName:'Fontes', cpf:'2254447895', movies:[] },
+        { id: 4, name: 'Tatiana', lastName:'Alvarez', cpf:'3321145589', movies:[] },        
+    ],
+    operation: {
+        client: null,
+        movie: null
+    },
+})
+
+export { store }                                
+                                `
+                            },
+                            {
+                                text:'Observe que r9x disponibiliza uma função "storeFactory" para criar a store observável. Em aplicações mais complexa multiplas stores podem ser criadas.',
+                            },
+                            {
+                                text:'storeFactory recebe um objeto que contém as chaves de dados da store  sendo criobservávelada e a retorna.'
+                            },
+                            {
+                                text:'Por fim, a store criada é exportada e pode ser observada por qualquer componente. Mas, para isso o componente precisa importá-la em suas dependências. Faremos isso no componente appSearch.'
+                            },
+                            {
+                                text: 'o códgo completo do componente fica assim:',
+                                code: `
+/*appSearch.component.js*/
+
+import template from './appSearch.template'
+import styles from './appSearch.styles'
+import { store } from '../../store'
+
+const appSearch = () => {
+
+    const events = ({on, query, methods, directives}) => ({
+        onType () {
+            const input = query('.search-input')
+            let value = ''
+
+            on('keyup', [input], ({target}) => { 
+                if(target.value) value = target.value
+                methods.filterMovies({target})
+            })
+
+        }
+    })
+
+    const methods = ({props, state}) => ({
+        getSelector (input) {
+            return input.getAttribute('key')
+        },
+
+        filterMovies ({target}) {
+            const { storeKey } = props.get().object
+            const { value } = target
+            const regex = new RegExp(\`\${ value }\`,'ig')
+
+            const result = store.get()[storeKey].filter( item => {
+                const itemKeys = Object.keys(item)
+                return itemKeys.filter(key => item[key].toString().match(regex)).join('')
+            })
+
+            store.update((storeData) => {
+                if(!storeData.hasOwnProperty('search')) storeData.search = {}
+                storeData.search[storeKey] = result
+            })
+
+        }
+    })
+
+    return {
+        template,
+        styles,
+        events,
+        methods,
+    }
+}
+
+export { appSearch }
+                                
+`
+                            },
+                            {
+                                text:'Na próxima sessão, criaremos os componentes appMovieList e appMovie. Esses componentes são responsáveis por listar os filmes e exibir o resultado da filtragem realizada pelo componente appSeaarch.'
+                            }
+                        ]
+                    },
+                    {
+                        title:'appMovieList - Listando os filmes da store',
+                        paragraphs: [
+                            { text:'O componente appMovieList deve exibir a lista de filmes através do componente filho appMovie e garantir que a view seja atualizada sempre e somente quando a store de dados sofrer alterações.'},
+                            {
+                                text:'Crie os arquivos abaixo dentro da pasta appMovieList na pasta componentes:',
+                                code:`
+appMovieList.template.js                                
+appMovieList.styles.js                                
+appMovieList.component.js       
+
+`
+                            },
+                            {
+                                text:'No arquivo de template insira o código abaixo:',
+                                code:`
+/*appMovieList.template.js*/
+
+export default ({props, state}) => {
+
+    const repeat = (template, dataArr) => {
+        return dataArr.map(item => template(item)).join('')
+    }
+
+    const movieTpl = (movie) => /*html*/ \`
+        <app-movie data-props="{'movieId': '\${movie.id}'}"></app-movie>
+    \` 
+
+    return /*html*/ \`
+        <div class="movie-list-wrapper">
+            \${repeat(movieTpl, state.movieList)}    
+        </div>
+    \`
+}
+
+`
+                            },
+                            {
+                                text:'Observe o trecho abaixo:',
+                                code:`
+    const repeat = (template, dataArr) => {
+        return dataArr.map(item => template(item)).join('')
+    }
+
+`
+                            },
+                            {
+                                text: 'A função repeate tem o dever de repetir um fragmento de template baseado em um array de dados e retornar as repetiçoes desse fragmento todas de uma só vez.'
+                            },
+                            {
+                                text:'No trecho abaixo, criamos um fragmeno de template que contém a tag do componente filho appMovie e essa tag recebe uma propriedade reativa movieId que mais tarde será utilizada para selecionar um filme a ser exibido por cada uma das repetições do componente appMovie.',
+                                code: `
+const movieTpl = (movie) => /*html*/ \`
+    <app-movie data-props="{'movieId': '\${movie.id}'}"></app-movie>
+\` 
+`
+                            },
+                            {
+                                text:'Por fim, o código abaixo utiliza o fragmento de template criado anteriormente e a função repeat para repetir o componente appMovie lhe fornecendo a propriedade reativa movieId.',
+                                code:`
+return /*html*/ \`
+    <div class="movie-list-wrapper">
+        \${repeat(movieTpl, state.movieList)}    
+    </div>
+\`                                
+`
+                            },
+                            {
+                                text:'hora de criar mais um css clichê para estilizar o componente appMovieList.',
+                                code: `
+/*appMovieList.styles.js*/
+
+export default () => /*css*/ \`
+    app-movie-list .movie-list-wrapper {
+        display:block;
+        float:left;
+        width:100%;
+    }
+\`
+
+`
+                            },
+                            {
+                                text:'Chegou o momento de implementar a lógica do componente. Utilize o código abaixo:',
+                                code: `
+import template from './appMovieList.template'
+import styles from './appMovieList.styles'
+
+import { appMovie } from '../appMovie/appMovie.component'
+
+import { store } from '../../store'
+
+const appMovieList = () => {
+
+    const state = {
+        movieList: store.get().movieList,
+    }
+
+    const children = () => ({
+        appMovie
+    })
+
+
+    const hooks = ({ state, methods }) => ({
+        beforeOnInit() {
+            store.subscribe(({ search }) => {
+                const movieList = search?.movieList
+                const hasChanges = methods.hasChanges(state.get().movieList, movieList)
+                if(hasChanges && movieList) state.set({ movieList })
+            })
+        }
+    })
+
+    const methods = () => ({
+
+        hasChanges(oldState, newState) {
+            const oldStateJson = JSON.stringify(oldState)
+            const newStateJson = JSON.stringify(newState)
+            return oldStateJson !== newStateJson
+        }       
+
+    })
+
+    return {
+        state,
+        template,
+        styles,
+        children,
+        hooks,
+        methods
+    }
+}
+
+export { appMovieList }
+                                `
+                            },
+                            {
+                                text:'Observe que importamos o template, os estilos, a store de dados e o componente filho appMovie do qual appMovieList depende para exibir cada um dos filmes.',
+                                code:`
+import template from './appMovieList.template'
+import styles from './appMovieList.styles'
+
+import { store } from '../../store'
+import { appMovie } from '../appMovie/appMovie.component'
+
+`
+                            },
+                            {
+                                text:'Em seguida o state local do componente foi declarado.',
+                                code:`
+const state = {
+    movieList: store.get().movieList,
+}
+                                `
+                            },
+                            {
+                                text: 'Após o state ser declarado, registramos o componente appMovie como filho de appMovieList',
+                                code:`
+const children = () => ({
+    appMovie
+})      
+
+`
+                            },
+                            {
+                                text:'Observe que também registramos os hooks e os métodos para este componente.',
+                                code:`
+const hooks = ({ state, methods }) => ({
+    beforeOnInit() {
+        store.subscribe(({ search }) => {
+            const movieList = search?.movieList
+            const hasChanges = methods.hasChanges(state.get().movieList, movieList)
+            if(hasChanges && movieList) state.set({ movieList })
+        })
+    }
+})
+
+const methods = () => ({
+
+    hasChanges(oldState, newState) {
+        const oldStateJson = JSON.stringify(oldState)
+        const newStateJson = JSON.stringify(newState)
+        return oldStateJson !== newStateJson
+    } 
+                            
+
+`
+                            },
+                            {
+                                text: 'Veja que o componente se inscreve para ouvir mudanças na store através da função subscribe da própria store que recebe um objejo "search" que pode conter uma lista de filmes filtrados pelo componente de busca.',
+                                code:`
+    beforeOnInit() {
+        store.subscribe(({ search }) => {
+            const movieList = search?.movieList
+            const hasChanges = methods.hasChanges(state.get().movieList, movieList)
+            if(hasChanges && movieList) state.set({ movieList })
+        })
+    }                                
+                                `
+                            },
+                            {
+                                text:'No trecho de código a seguir, o componente identifica que houve uma mudança nos dados da store e verifica se os dados do state local estão diferentes dos novos dados presentes na store. Caso esteja o componente atualiza o state local e consequentemente seu template com os novos dados da store.',
+                                code:`
+const movieList = search?.movieList
+const hasChanges = methods.hasChanges(state.get().movieList, movieList)
+if(hasChanges && movieList) state.set({ movieList })
+                                `
+                            },
+                            {
+                                text:'Para detectar diferenças no state local, o componente faz uso da função hashChanges que compara o state local com a store.',
+                                code: `
+hasChanges(oldState, newState) {
+    const oldStateJson = JSON.stringify(oldState)
+    const newStateJson = JSON.stringify(newState)
+    return oldStateJson !== newStateJson
+}          
+
+`
+                            },
+                            {
+                                text: 'Por fim, a factory appMovieList retorna todos os recursos necessários para criar um componente e é exportada para ser usada no momento adequado.',
+                                code: `
+
+/*codigo omitido*/
+
+const appMovieList = () => {
+
+/*codigo omitido*/
+
+    return {
+        state,
+        template,
+        styles,
+        children,
+        hooks,
+        methods
+    }
+}
+
+export { appMovieList }
+
+                                `
+                            },
+                            {
+                                text: 'Agora é uma boa hora para importar os componentes appTitle, appSearch e appMovieList em appHome. Embora não seja possível testar a aplicação sem criar o componente appMovie.',
+                                code:`
+                                
+/*appHome.component.js*/
+
+import template from './appHome.template.js'
+import styles from './appHome.styles.js'
+
+import { appTitle } from '../appTitle/appTitle.component'
+import { appSearch } from '../appSearch/appSearch.component'
+import { appMovieList } from '../appMovieList/appMovieList.component'
+
+const appHome = () => {
+
+    const children = () => ({
+        appTitle,
+        appSearch,
+        appMovieList,
+    })
+    
+    return  {
+        template,
+        styles
+    }
+
+}
+
+export { appHome }  
+                              `
+                            },
+                            {
+                                text: 'Na próxima sessão criaremos o componente appMovie e então poderemos testar a aplicação parcialmente.'
+                            }
+                        ]
+                    },
+                    {
+                        title:'AppMovie - Exibindo dados diferentes para cada instância.',
+                        paragraphs: [
+                            {
+                                text: 'Cada vez que o componente appMovie é renderizado, uma nova instância é criada. Como o state é local, os dados presentes no state de cada instância são independentes.'
+                            },
+                            {
+                                text: 'Dentro da pasta components cria a pasta appMovie e dentro dela os arquivos abaixo:',
+                                code: `
+/*components\/appMovie/*                                
+
+appMovie.component.js
+appMovie.template.js
+appMovie.styles.js
+                                `
+                            },
+                            {
+                                text:'Comece definindo o template do componente appMovie: ',
+                                code:`
+/*appMovie.template.js*/
+
+export default ({props, state, methods}) => {
+
+    if (!methods.hasMovies()) return ''
+    const movie = methods.getMovie(props.object.movieId)
+    const notHaveButtons = () => props.object.hideButtons && props.object.hideButtons === true
+
+    const buttonsTpl = () => {
+        if (notHaveButtons()) return ''
+        return /*html*/ \`
+            <app-mark-to data-props="{'type':'movie', 'movieId':'\${props.object.movieId}'}"></app-mark-to>
+        \`
+    }
+
+    return /*html*/ \`
+    <div class="movie-wrapper \${methods.isSelected(props.object.movieId) && !notHaveButtons() ? 'selected' : ''}">
+        <div class="title">\${movie.title}</div>
+        <div class="description">\${movie.title} - \${movie.description}</div>
+        <div class="buttons">
+            \${buttonsTpl()}
+        </div>
+    </div>
+\`
+}
+
+                                `
+                            },
+                            {
+                                text: 'Observe que dessa vez, o template recebe a propriedade methods. Isso é muito útil quando o template precisa de lógica adicional para fazer validações ou obter dados computados.'
+                            },
+                            {
+                                text:'Como o template recebe a propriedade methods, a função getMovie pode ser acessaa para recuperar os dados que o template deve exibir. Esses dados são armazenados na variavel "movie".'
+                            },
+                            {
+                                text: 'No trecho de código abaixo,  a funçao notHaveButtons verifica se o fragmento de template "buttonsTpl" declarado logo abaixo dela deve ser exibido.',
+                                code:`
+    const notHaveButtons = () => props.object.hideButtons && props.object.hideButtons === true
+
+    const buttonsTpl = () => {
+        if (notHaveButtons()) return ''
+        return /*html*/ \`
+            <app-mark-to data-props="{'type':'movie', 'movieId':'\${props.object.movieId}'}"></app-mark-to>
+        \`
+    }                                
+                                `
+                            },
+                            {
+                                text:'Veja que no fragmento de template de botões "buttonsTpl" está contido o componente appMarkTo:',
+                                code:`
+<app-mark-to data-props="{'type':'movie', 'movieId':'\${props.object.movieId}'}"></app-mark-to>                                
+                                `
+                            },
+                            {
+                                text:'Esse componente recebe através de propriedades reativas (type & movieId) informações que serão úteis na hoje de definir que filmes estão sendo alugados. Logo adiante precisaremos criar esse componente. Mas, por equanto pode ignorá-lo.'
+                            },
+                            {
+                                text:'Por fim, um conjunto de tags do fragmento principal do template é retornado.',
+                                code:`
+    return /*html*/ \`
+    <div class=”movie-wrapper \${methods.isSelected(props.object.movieId) && !notHaveButtons() ? 'selected' : ''}”>
+        <div class=”title”>\${movie.title}</div>
+        <div class=”description”>\${movie.title} - \${movie.description}</div>
+        <div class=”buttons”>
+            \${buttonsTpl()}
+        </div>
+    </div>
+\`                                
+                                `
+                            },
+                            {
+                                text: 'Observe o trecho de código:',
+                                code: `
+<div class="movie-wrapper \${methods.isSelected(props.object.movieId) && !notHaveButtons() ? 'selected' : ''}">
+                                `
+                            },
+                            {
+                                text:'Esse trecho de código valida se os dados do componente foram marcados para locação e se o componente está exibindo botões de controle ou não. Caso tenha botões definidos, o seletor selected será aplicada ao template. Parece estranha a segunda validação. Porém, assim que o componente sidebar for implementado essa validação fará total sentido.'
+                            },
+                            {
+                                text: 'Hora de aplicar os estilos do componente:',
+                                code:`
+/*appMovie.template.js*/
+
+export default () => /*css*/ \`
+
+    app- movie.movie - wrapper {
+        display: block;
+        float: left;
+        width: 100 %;
+        padding: 15px;
+        margin- bottom: 15px;
+        border- radius: 4px;
+        border: 1px #f7f6f8 solid;
+        background:#fff;
+        box- shadow: 3px 3px 3px #f4f3f6
+    }
+
+    app- movie.selected { border- color:#2ad58e}
+
+    app - movie.title {
+        font - weight: 700
+    }
+
+    app - movie.title,
+        app - movie.description {
+        display: block;
+        float: left;
+        width: 100 %;
+        padding - bottom: 15px;
+        border - bottom: 1px #ebebeb solid;
+        color:#666;
+        font - size: 1em;
+        text - transform: uppercase;
+        line - height: 1.5em
+    }
+
+    app - movie.description {
+        text - transform: none;
+        padding - top: 15px;
+        border - bottom: none;
+        font - weight: 500
+    }
+
+    app - movie.buttons {
+        display: block;
+        float: left;
+        width: 100 %;
+        padding - top: 15px;
+        text - align: right;
+    }
+\`
+
+                                `
+                            },
+                            {
+                                text:'Agora utilize o código abaixo para implementar o componente.',
+                                code: `
+/*appMovie.component.js*/
+
+import template from './appMovie.template'
+import styles from './appMovie.style'
+import { appMarkTo } from '../appMarkTo/appMarkTo.component'
+import { store } from '../../store'
+
+const appMovie = () => {
+
+    const state = {
+        movieList: store.get().movieList,
+        selected: false
+    }
+
+    const children = () => ({
+        appMarkTo
+    })
+
+    const hooks = ({methods}) => ({
+
+        beforeOnInit() {
+            store.subscribe((payload) => {
+                methods.movieInOperation(payload) ? methods.selectMovie() : methods.unselectMovie()
+            })
+        },        
+
+    })
+
+    const methods = ({props, state}) => ({
+
+        getMovie (movieId) {
+            const { movieList } = state.get()
+            return movieList.find( movie => +movie.id === +movieId)
+        },
+
+        hasMovies () {
+            const { movieList } = state.get()
+            return movieList.length
+        },
+
+        isSelected(movieId) {
+            const { operation } = store.get()
+            return (operation.movie !== null && +operation.movie.id === +movieId)
+        },
+
+        selectMovie() {
+            state.set({ selected: true })
+        },
+        unselectMovie() {
+            state.set({ selected: false })
+        },
+
+        movieInOperation(dataStore) {
+            const { operation } = dataStore
+            const { object } = props.get()
+            return operation.movie !== null && +operation.movie.id === +object.movieId
+        }
+
+    })
+
+    return {
+        state,
+        template,
+        styles,
+        children,
+        hooks,
+        methods,
+    }
+}
+
+export { appMovie }
+
+                                `
+                            }, {
+                                text:'Parece que muito está acontecendo e é verdade. Mas todas as operações realizadas são simples.'
+                            },
+                            {
+                                text:'Primeiro importamos as dependências do componente, incusive o componente filho appMarkTo e a store',
+                                code: `
+import template from './appMovie.template'
+import styles from './appMovie.style'
+import { appMarkTo } from '../appMarkTo/appMarkTo.component'
+import { store } from '../../store'                                
+                                `
+                            },
+                            {
+                                text: 'Logo depois o state local é declarao:',
+                                code: `
+const appMovie = () => {
+    const state = {
+        movieList: store.get().movieList,
+        selected: false
+    }    
+}                                
+                                `
+                            },
+                            {
+                                text: 'Na sequência, appMovie registra appMarkTo como filho.',
+                                code: `
+const children = () => ({
+    appMarkTo
+})                                
+                                `
+                            },
+                            {
+                                text: 'AppMovie também registra o hook beforeOnInit e o utiliza para ouvir as mudanças na store de dados.',
+                                code: `
+const hooks = ({methods}) => ({
+
+    beforeOnInit() {
+        store.subscribe((payload) => {
+            methods.movieInOperation(payload) ? methods.selectMovie() : methods.unselectMovie()
+        })
+    },        
+
+})                                
+                                `
+                            },
+                            {
+                                text:'Veja, toda vez que uma mudança ocorrer na store, o callback passado para store.subscribe será executado e então o método movieInOperation receberá os novos dados da store. Esse método verifica se existe um filme registrado para uma operação de locação na store.'
+                            },
+                            {
+                                text: 'A store possue a propriedade opertaion e caso um filme seja registrado na chave movie de operation, movieInOperation retornará true o que permite a execução do método selectMovie que destacará o layoute do componente selecionado. Agora, caso não exista um filme, unslectMovie vai garantir que nenhum template seja destacado.'
+                            },
+                            {
+                                text:'Esse métodos só podem ser acessados pelos hooks, porque foram declarados através da factory methods dentro do componente.',
+                                code: `
+   const methods = ({props, state}) => ({
+
+        getMovie (movieId) {
+            const { movieList } = state.get()
+            return movieList.find( movie => +movie.id === +movieId)
+        },
+
+        hasMovies () {
+            const { movieList } = state.get()
+            return movieList.length
+        },
+
+        isSelected(movieId) {
+            const { operation } = store.get()
+            return (operation.movie !== null && +operation.movie.id === +movieId)
+        },
+
+        selectMovie() {
+            state.set({ selected: true })
+        },
+        unselectMovie() {
+            state.set({ selected: false })
+        },
+
+        movieInOperation(dataStore) {
+            const { operation } = dataStore
+            const { object } = props.get()
+            return operation.movie !== null && +operation.movie.id === +object.movieId
+        }
+
+    })                                
+                                `
+                            },
+                            {
+                                text:'Os três primeiros métodos declarados no bloco acima são utilizados pelo template. Já falamos sobre eles. Já os métodos selectMovie e unselectMovie, são chamados para atualizar o state caso seja necessário. Por fim, o método movieInOperation é quem define qual dos dois métodos executar.'
                             }
                         ]
                     }
