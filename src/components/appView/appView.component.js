@@ -18,19 +18,20 @@ const appView = () => {
     const methods = () => ({
 
         htmlEncode(str) {
-            if (!str) return ''
-            let i = str.length,
-                aRet = [];
-
-            while (i--) {
-                let iC = str[i].charCodeAt();
-                if (iC < 65 || iC > 127 || (iC > 90 && iC < 97)) {
-                    aRet[i] = '&#' + iC + ';';
-                } else {
-                    aRet[i] = str[i];
-                }
+            const specialChars = {
+                '&':'&amp;',
+                '<':'&lt;',
+                '>':'&gt;',
+                '"':'&#34;',
+                "'":'&#x27;',
+                '/':'&#x2F;',
             }
-            return aRet.join('');
+
+            const regexScaper = /[&<>"'\/]/g
+
+            const result = ` ${str}`.replace(regexScaper, (match) => specialChars[match])
+            console.log(result)
+            return result
         }
 
     })

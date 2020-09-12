@@ -60,7 +60,7 @@ const routes = {
     firstRoute: { hash: '#/', component: appHome },
     defaultRoute: { hash: '#/404', component: appNotFound },
     otherRoutes: [
-        { hashExp: /^\#\\/$/, component: appHome },
+        { hashExp: /^\#\/$/, component: appHome },
     ]
 }
 
@@ -80,7 +80,7 @@ const routes = {
     firstRoute: { hash: '#/', component: appHome },
     defaultRoute: { hash: '#/404', component: appNotFound },
     otherRoutes: [
-        { hashExp: /^\#\\/$/, component: appHome },
+        { hashExp: /^\#\/$/, component: appHome },
     ]
 }                            
                             `
@@ -124,7 +124,7 @@ const appHelloWord = () => {
     }
 
     const template = ({props, state}) => {
-        return /*html*/ \`< h1 > \${state.text} < /h1 >\`
+        return /*html*/ \`<h1> \${state.text} </h1>\`
     }
 
     const styles = () => /*css*/ \`
@@ -160,14 +160,14 @@ const appHelloWord = () => {
                                 text: 'R9X utiliza template literals para marcar o html. Dessa forma reduz complexidade e elimina a necessidade de criar diretivas acionadas diretamente no template para proporcionar interação e realizar transformações ou validações nos dados do compoenente. Segue abaixo o trecho de código que representa o template do componente.',
                                 code: `
     const template = ({props, state}) => {
-        return /*html*/ \`< h1 > \${state.text} < /h1 >\`
+        return /*html*/ \`<h1> \${state.text} </h1>\`
     }                            
                             `
                             },
                             {
                                 text: 'Observe que nesse caso, o template tem acesso a props e state. Props, acessa as propriedades reativas passadas pela tag do componente, enquanto state acessa as propriedades do state.',
                                 code: `
-< app-hello-world data-props="{'text':'hello world'}">< /app-hello-world >                            
+<app-hello-world data-props="{'text':'hello world'}"></app-hello-world>                            
                             `
                             },
                             {
@@ -176,7 +176,7 @@ const appHelloWord = () => {
                             {
                                 code: `
     const template = ({props, state}) => {
-        return /*html*/ \`< h1 > \${props.object.text} < /h1 >\`
+        return /*html*/ \`<h1> \${props.object.text} </h1>\`
     }                            
                             `
                             },
@@ -184,7 +184,7 @@ const appHelloWord = () => {
                                 text: 'A propriedade methods do componente também está acessível para o template. Por tanto, é possível realizar a transformação e validação de dados acessando uma função previamente definida caso seja necessário.',
                                 code: `
     const template = ({methods}) => {
-        return /*html*/ \`< h1 > \${methods.getText()} < /h1 >\`
+        return /*html*/ \`<h1> \${methods.getText()} </h1>\`
     }                               
                             `
                             }
@@ -290,7 +290,7 @@ const appHelloWorld = () => {
     }
 
     const template = ({props, state}) => {
-        return /*html*/ \`< h1 > \${state.text} < /h1 >\`
+        return /*html*/ \`<h1> \${state.text} </h1>\`
     }    
     
     const styles = () => /*css*/ \`
@@ -476,7 +476,7 @@ const appTitle = () => {
     const state = store.get()
 
     const template = ({props, state}) => {
-        return /*html*/ \`< h1 > \${state.title} < /h1 >\`
+        return /*html*/ \`<h1> \${state.title} </h1>\`
     }
 
     const styles = () => /*css*/ \`
@@ -701,8 +701,8 @@ const routes = {
     firstRoute: { hash: '#/', component: appHome },
     defaultRoute: { hash: '#/404', component: appNotFound },
     otherRoutes: [
-        { hashExp: /^\#\/$/, component: appHome },
-        { hashExp: /^\#\/user\/\d+$/, component: appUserDetail },
+        { hashExp: /^\#/$/, component: appHome },
+        { hashExp: /^\#/user/\d+$/, component: appUserDetail },
     ]
 }                                
                                 `
@@ -726,8 +726,8 @@ defaultRoute: { hash: '#/404', component: appNotFound },
                                 text: 'A chave otherRoutes também segue a mesma lógica, porém, carrega componentes para rotas existentes sempre que ocorre uma mudança na url do navegador. Observe ainda que o objeto interno dessa propriedade não possui a propriedade hash e sim a propriedade hashExp que é uma expressão regular ao contrário da propriedade hash que armazena uma string.',
                                 code:`
 otherRoutes: [
-    { hashExp: /^\#\/$/, component: appHome },
-    { hashExp: /^\#\/user\/\d+$/, component: appUserDetail },
+    { hashExp: /^\#/$/, component: appHome },
+    { hashExp: /^\#/user/\d+$/, component: appUserDetail },
 ]                                
                                 `
                             },
@@ -749,7 +749,7 @@ const routes = {
     firstRoute: { hash: '#/', component: appHome },
     defaultRoute: { hash: '#/404', component: appNotFound },
     otherRoutes: [
-        { hashExp: /^\#\/$/, component: appHome },
+        { hashExp: /^\#/$/, component: appHome },
     ]
 }
 
@@ -788,7 +788,7 @@ appHome.styles.js
                             {
                                 text:'Dentro do arquivo appHome.component.js insira o código abaixo:',
                                 code:`
-//apHome.component.js
+/*appHome.template.js*/
                                 
 import template from './appHome.template.js'
 import styles from './appHome.styles.js'
@@ -811,7 +811,7 @@ export { appHome }
 //appHome.template.js                                
 
     export default ({props, state}) => {
-        return /*html*/ \`< h1 > appHome < /h1 >\`
+        return /*html*/ \`<h1> appHome </h1>\`
     }
                                 `
                             },
@@ -851,7 +851,7 @@ const routes = {
     firstRoute: { hash: '#/', component: appHome },
     defaultRoute: { hash: '#/404', component: appNotFound },
     otherRoutes: [
-        { hashExp: /^\#\\/$/, component: appHome },
+        { hashExp: /^\#\/$/, component: appHome },
     ]
 }
 
@@ -883,9 +883,7 @@ appTitle.styles.js
 //appTitle.template.js
 
 export default ({props, state}) => /*html*/ \`
-<div class="title-wrapper">
-        < h1 class="title \${props.object.style ? props.object.style : ''}" >\${props.object.title}< /h1 >
-    </div>
+<div>"teste"</div>
 \`
 
 `
@@ -893,7 +891,7 @@ export default ({props, state}) => /*html*/ \`
                             {
                                 text: 'Observe o seguinte treco de código:',
                                 code: `
-< h1 class="title \${props.object.style ? props.object.style : ''}" >\${props.object.title}< /h1 >
+<h1 class="title \${props.object.style ? props.object.style : ''}">\${props.object.title}</h1>
                                 `
                             },
                             {
@@ -1020,10 +1018,38 @@ import { appTitle } from '../appTitle/appTitle.component'
 //appHome.template.js
 
 export default ({props, state}) => /*html*/ \`
-    < app-title data-props="\{'title':'Vitrine', 'style':'purple'\}" >< \/app-title >
+    <app-title data-props="\{'title':'Vitrine', 'style':'purple'\}"></app-title>
 \`
 
 `
+                            },
+                            {
+                                text:'Ao acessar a rota principal da aplicação, você perceberá que o componente title já está renderizado e exibindo o valor do título informado via propriedade e que o estilo purple também passado por propriedade foi aplicado.'
+                            },
+                            {
+                                text:'A verdade é que ainda faremos mais alterações na home. O que faremos agora é definir a estrutura completa dessa página e ela nos servirá de guia para criar os demais componentes que a compoem. O código completo do template do componente appHome fica assim:',
+                                code:`
+/*appHome.template.js*/
+
+export default ({ props, state }) => /*html*/ \`
+    <div class="home-wrapper">
+        <app-title data-props="{'title':'Vitrine', 'style':'purple'}"></app-title>
+        <div class="movie-list">
+            <app-title data-props="{'title':'Filmes', 'style':'white'}"></app-title>
+            <app-search data-props="{'storeKey':'movieList', 'placeholder':'Buscar filmes'}"></app-search>
+            <app-movie-list></app-movie-list>
+        </div>
+        <div class="user-list">
+            <app-title data-props="{'title':'Clientes', 'style':'white'}"></app-title>
+            <app-search data-props="{'storeKey':'userList', 'placeholder':'Buscar clientes'}"></app-search>
+            <app-user-list> </app-user-list>
+        <\ div>
+        <div class="sidebar">
+            <app-sidebar data-props="{'showButtons':true, 'buttons':['cancel', 'confirm']}"></app-sidebar> 
+        </div>
+    </div>
+\`                                
+                                `
                             }
                         ]
                     }

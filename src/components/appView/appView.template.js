@@ -26,7 +26,7 @@ export default ({ props, state, methods }) => {
                 articleParagraphs = article.paragraphs.map(paragraph => {
                     let paragraphText, paragraphCode = ''
                     paragraph.text && paragraph.text !== '' ? paragraphText = /*html*/ `<p class="paragraph">${paragraph.text}</p>` : 'xxx'
-                    paragraph.code && paragraph.code !== '' ? paragraphCode = /*html*/ `<app-code data-text="${methods.htmlEncode(paragraph.code)}"></app-code>` : 'xxx'
+                    paragraph.code && paragraph.code !== '' ? paragraphCode = /*html*/ `<app-code data-text="${paragraph.code.replace(/["]/g, '&#148;')}"></app-code>` : 'xxx'
 
                     return `${paragraphText || ''} ${paragraphCode || ''}`
                 }).join('')
