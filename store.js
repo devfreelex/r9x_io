@@ -2035,7 +2035,230 @@ const hooks = ({methods}) => ({
                             },
                             {
                                 text:'Os três primeiros métodos declarados no bloco acima são utilizados pelo template. Já falamos sobre eles. Já os métodos selectMovie e unselectMovie, são chamados para atualizar o state caso seja necessário. Por fim, o método movieInOperation é quem define qual dos dois métodos executar.'
+                            },
+                            {
+                                text: 'Como o componente escuta as mudanças nos dados da store, caso state.set seja chamado para atualizar o state em conformidade com os dados provenientes da store, então o template do componente será atualizado.'
+                            },
+                            {
+                                text:'Na próxima sessão será criado o componente appMarkTo.'
                             }
+                        ]
+                    },
+                    {
+                        title:'AppMarkTO - Registrando operções de locação',
+                        paragraphs: [
+                            {
+                                text: 'O componente appMarkTo é reponsável por criar uma operação de locação e marcar os filmes para ela.'
+                            },
+                            {
+                                text: 'Crie uma nova pasta "appMarkTo" dentro da pasta components e dentro dela os arquivos abaixo:',
+                                code:`
+/*components/appMarkTo*/
+
+appMarkto.componente.js
+appMarkTo.template.js
+appMarkTo.styles.js                                
+                                `
+                            },
+                            {
+                                text:'Dentro do arquivo de template do componente introduza o código abaixo:',
+                                code: `
+/*appMarkTo.template.js*/
+
+export default ({props, state}) => /*html*/ \`
+    <div class="mark-to-wrapper">
+        <button class="btn-mark">Selecionar</button>
+    </div>
+\`
+`
+                            },
+                            {
+                                text: 'O template desse componente é realmente simples. Possue apenas tags de marcação. Aproveite e implemente os estilos do componente.',
+                                code: `
+/*appMarkTo.styles.js*/
+
+export default () => /*css*/ \`
+    app-mark-to .mark-to-wrapper {
+        display:inline-block;
+    }
+
+    app-mark-to .btn-mark {
+        display: block;
+        float: left;
+        width: 100%;
+        padding: 10px 15px;
+        border-radius: 4px;
+        font-size: .875em;
+        text-align: center;
+        border: 1px #2ad58e solid;
+        color: #2ad58e;
+        background: #f7f7f8;
+        text-decoration: none;
+        outline: none;
+        transition: .2s ease-in;
+        cursor: pointer;
+    }
+
+    app-mark-to .btn-mark:hover {
+        border: 1px #2ad58e solid;
+        color: #fff;
+        background: #2ad58e;        
+    }
+
+\`                                
+`
+                            },
+                            {
+                                text:'Os estilos também são bem simples e apenas adicionam um comportamento visual elegante.'
+                            },
+                            {
+                                text: 'Hora de implementar o componente.',
+                                code:`
+/*appMarkTo.componente.js*/
+
+import template from './appMarkTo.template'
+import styles from './appMarkTo.styles'
+import { store } from '../../store'
+
+const appMarkTo = () => {
+
+    const events = ({query, on, methods}) => ({
+        
+        onClickToSelect () {
+            const btn = query('button')
+            on('click', [btn], (e) => {
+                methods.setOperation()
+            })
+        }
+        
+    })
+
+    const methods = ({props, state}) => {
+
+        const setUserOperation = (userId) => {
+            store.update((dataStore) => {
+                const user = dataStore.userList.find( user => +user.id === +userId)
+                dataStore.operation.client = user
+            })
+
+        }
+
+        const setMovieOperation = (movieId) => {
+            store.update((dataStore) => {
+                const movie = dataStore.movieList.find(movie => +movie.id === +movieId)
+                dataStore.operation.movie = movie
+            })
+
+        }
+
+        const setOperation = () => {
+            const { object } = props.get()
+            if(object.type && object.type === 'user') return setUserOperation(object.userId)
+            if(object.type && object.type === 'movie') return setMovieOperation(object.movieId)
+        }
+
+        return { setOperation }
+    }
+
+    return {
+        template,
+        styles,
+        events,
+        methods
+    }
+
+}
+
+export {
+    appMarkTo
+}
+                                `
+                            },
+                            {
+                                text:'Observe que primeiro importamos as dependências do componente:',
+                                code: `
+import template from './appMarkTo.template'
+import styles from './appMarkTo.styles'
+import { store } from '../../store'                                
+                                `
+                            },
+                            {
+                                text:'Na sequência, dentro da factor appMarkTo foram declarados os eventos do componente.',
+                                code:`
+const events = ({query, on, methods}) => ({
+    
+    onClickToSelect () {
+        const btn = query('button')
+        on('click', [btn], (e) => {
+            methods.setOperation()
+        })
+    }
+    
+})                                
+                                `
+                            },
+                            {
+                                text:'Quando o evento de click ocorrer no botão do componente, uma operação será criada. Veja os métodos do componente.',
+                                code: `
+    const methods = ({props, state}) => {
+
+        const setUserOperation = (userId) => {
+            store.update((dataStore) => {
+                const user = dataStore.userList.find( user => +user.id === +userId)
+                dataStore.operation.client = user
+            })
+
+        }
+
+        const setMovieOperation = (movieId) => {
+            store.update((dataStore) => {
+                const movie = dataStore.movieList.find(movie => +movie.id === +movieId)
+                dataStore.operation.movie = movie
+            })
+
+        }
+
+        const setOperation = () => {
+            const { object } = props.get()
+            if(object.type && object.type === 'user') return setUserOperation(object.userId)
+            if(object.type && object.type === 'movie') return setMovieOperation(object.movieId)
+        }
+
+        return { setOperation }
+    }                                
+                                `,
+                            },
+                            {
+                                text: 'Note que setOperation acessa as propriedades reativas no caso a propriedade type para definir que tipo de operação de relacionamento está sendo criada.'
+                            },
+                            {
+                                text: 'Caso a propriedade type seja "user" a função setUserOperation obterá o usuário através do id de usuário fornecido através das propriedades reativas. Caso type seja movie a mesma lógica se aplica, mas, obtendo um filme ao invés de um usuário e a função executa será setMovieOperation.'
+                            },
+                            {
+                                text: 'Você deve ter notado uma diferença de sintaxe na declaração dos métodos desse componente. Isso acontece porque setOperation precisa acessar outros métodos no mesmo escopo. Então ao invés de retornar logo de inicio um objeto com os métodos dentro, foi melhor somente no fim da declaração dos métodos retornar um objeto literal criado manualmente. Veja abaixo uma comparação entre as duas técnicas.',
+                                code:`
+/*Primeira forma*/
+const methods = () => ({
+    methodsInside () {}
+})
+
+/*Segunda Forma*/
+const methods = () => {
+
+    const methodInClousure = () => {}
+
+    return {
+        methodInclousure
+    }
+}
+                                `
+                            },
+                            {
+                                text: 'Como o componente que acabamos de criar já foi importado dentro de appMovie, você não precisa fazer mais nada. Pode testar a aplicação.'
+                            },
+                            {
+                                text:'A exibição e filtragem de filmes já funciona corretamente, mas, ainda precisamos aplicar uma lógica muito semelhante para exibir e filtrar os clientes. Por isso, na próxima sessão criaremos os componentes appUserList e appUser.'
+                            }                        
                         ]
                     }
                 ]
