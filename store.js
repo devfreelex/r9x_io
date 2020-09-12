@@ -1048,8 +1048,45 @@ export default ({ props, state }) => /*html*/ \`
             <app-sidebar data-props="{'showButtons':true, 'buttons':['cancel', 'confirm']}"></app-sidebar> 
         </div>
     </div>
-\`                                
-                                `
+\`                             
+`
+                            },
+                            {
+                                text:'Precisamos criar mais 4 componentes de acordo com o códgo acima. Os componentes são appSearch, appMovieList, appUserList e appSidebar.'
+                            },
+                            {
+                                text:'Faremos isso a partir da próxima sessão. Mas antes, precisamos introduzir o restante dos estilos do componente. O código completo fica assim:',
+                                code:`
+/*appHome.styles.js*/
+
+export default () => /*css*/ \`
+    app-home .home-wrapper {
+        display:block;
+        float:left;
+        width:100%;
+        padding:15px;
+    }
+
+    app-home .movie-list,
+    app-home .user-list {
+        display:block;
+        float:left;
+        width:calc(50% - 7.5px);
+        padding:15px;
+    }
+
+    app-home .user-list {
+        margin-left:15px;
+    }
+
+    app-home .sidebar {
+        display:block;
+        float:right;
+        width:250px;
+        position:relative;
+    }
+\`
+`
                             }
                         ]
                     }
