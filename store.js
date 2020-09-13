@@ -2444,6 +2444,39 @@ appUser.component.js
 appUser.template.js
 appUser.styles.js                                
                                 `
+                            },
+                            {
+                                text:'Comece implementando o template:',
+                                code:`
+*appUser.template.js*/
+
+export default ({props, state, methods}) => {
+
+    const userId = props.object.userId
+
+    const notHaveButtons = () => props.object.hideButtons && props.object.hideButtons === true
+    
+    const buttonsTpl = () => {
+        if (notHaveButtons()) return ''
+        return /*html*/ \`
+            <div class="user-buttons">
+                <app-link data-props="{'hash': '#/user/\${props.object.userId}', 'label':'Histórico'}"></app-link>
+                <app-mark-to data-props="{'type':'user', 'userId': '\${userId}'}"></app-mark-top>
+            </div>        
+        \`
+    }
+    
+    return /*html*/ \`
+    <div class="user-wrapper \${methods.isSelected(userId) && !notHaveButtons() ? 'selected' : ''}">
+        <div class="user-name"> \${methods.getFullName(userId)}</div>
+        <div class="user-cpf">CPF: \${state.cpf}</div>
+        \${buttonsTpl()}
+    </div>\`
+}
+                                `
+                            },
+                            {
+                                text:'O template é muito parecido com o template do componente appMovie, com 3 diferenças, primeiro os dados de usuário são manipulados por méthods com o prefixo user, os métodos getFullName e setCpf são específicos para esse componente e por fim, o template espera o componente appLink para ser renderizado. Tirando isso não tem muita diferença.'
                             }
                         ]
                     }

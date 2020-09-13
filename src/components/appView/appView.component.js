@@ -24,10 +24,12 @@ const appView = () => {
                 '>':'&gt;',
                 '"':'&#34;',
                 "'":'&#x27;',
+                '`':'&#x96',
+                '$':'&#x36',
                 '/':'&#x2F;',
             }
 
-            const regexScaper = /[&<>"'\/]/g
+            const regexScaper = /[&<>"'`$\/]/g
 
             const result = ` ${str}`.replace(regexScaper, (match) => specialChars[match])
             console.log(result)
