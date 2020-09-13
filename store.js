@@ -2254,11 +2254,197 @@ const methods = () => {
                                 `
                             },
                             {
-                                text: 'Como o componente que acabamos de criar já foi importado dentro de appMovie, você não precisa fazer mais nada. Pode testar a aplicação.'
+                                text: 'Como o componente criado já foi importado dentro de appMovie, você não precisa fazer mais nada. Pode testar a aplicação.'
                             },
                             {
-                                text:'A exibição e filtragem de filmes já funciona corretamente, mas, ainda precisamos aplicar uma lógica muito semelhante para exibir e filtrar os clientes. Por isso, na próxima sessão criaremos os componentes appUserList e appUser.'
+                                text:'Ainda não é possivel completar uma operação de locação porque os componentes de listagem de usuários ou clientes ainda não existem. Portanto, será necessário criá-los na proxima sessão.'
                             }                        
+                        ]
+                    },
+                    {
+                        title:'Listagem de usuários/clientes.',
+                        paragraphs: [
+                            {
+                                text:'Para exibir a lista de usuários e permitir que seja filtrada é preciso criar os componentes appListUser e appUser. Eles são bem parecidos com appMovieList e appMovie.',
+                            },
+                            {
+                                text: 'Dentro da pasta componentes crie a pasta appUserList e dentro dela os arquivos:',
+                                code: `
+appUserList.componente.js                                
+appUserList.template.js                                
+appUserList.styles.js                                
+                                `
+                            },
+                            {
+                                text:'Utilize o código abaixo para o template do componente.',
+                                code: `
+/*appUserList.template.js*/
+
+export default ({props, state}) => {
+
+    const repeat = (template, dataArr) => {
+        return dataArr.map(item => template(item)).join('')
+    }
+
+    const userTpl = (user) => /*html*/ \`
+        <app-user data-props="{'userId': '\${user.id}'}"></app-user>
+    \`
+    
+    return /*html*/ \`
+        <div class="user-list-wrapper">
+            \${repeat(userTpl, state.userList)}
+        </div>
+    \`
+}                                
+`
+                            },
+                            {
+                                text:'Acima, no template, repeat espera receber um fragmento de template para repeti-lo com base em um array de dados. No trecho abaixo, o fragmento userTpl é passado como parametro para repeat jundo com a lista de usuários.',
+                                code: `
+    return /*html*/ \`
+        <div class="user-list-wrapper">
+            \${repeat(userTpl, state.userList)}
+        </div>
+    \`                                
+                                `
+                            },
+                            {
+                                text: 'Observe que userTpl contém o componente appUser que ainda não foi criado. Ainda nessa sessão vamos criá-lo.'
+                            },
+                            {
+                                text:'O próximo passo é criar os estilos do componente.',
+                                code: `
+/*appUserList.styles.js*/
+
+export default () => /*css*/ \`
+    app-user-list .user-list-wrapper {
+        display:block;
+        float:left;
+        width:100%;
+    }
+\`
+
+                                `
+                            },
+                            {
+                                text: 'Com o template e estilos já definidos, é preciso definir o código do componente.',
+                                code: `
+import template from './appUserList.template'
+import styles from './appUserList.styles'
+
+import { appUser } from '../appUser/appUser.component'
+import { store } from '../../store'
+
+const appUserList = () => {
+
+    const state = {
+        userList: store.get().userList
+    }
+
+    const children = () => ({
+        appUser
+    })
+
+    const hooks = ({ state, methods }) => ({
+        beforeOnInit() {
+            store.subscribe(({ search }) => {
+                const userList = search?.userList
+                const hasChanges = methods.hasChanges(state.get().userList, userList)
+                if (hasChanges && userList) state.set({userList})
+            })
+        }
+    })   
+    
+    const methods = ({props, state}) => ({
+        
+        hasChanges (oldState, newState) {
+            const oldStateJson = JSON.stringify(oldState)
+            const newStateJson = JSON.stringify(newState)
+            return oldStateJson !== newStateJson
+        },
+
+    })
+
+    return {
+        state,
+        template,
+        styles,
+        children,
+        hooks, 
+        methods
+    }
+}
+
+export { appUserList }                                
+                                `
+                            },
+                            {
+                                text:'Primeiro importamos as dependências do componente. Inclusive appUser que ainda não existe. Por isso, se você testar agora a aplcação ocorrerá um erro. Mas não se precupe logo iremos criá-lo.',
+                                code:`
+import template from './appUserList.template'
+import styles from './appUserList.styles'
+
+import { appUser } from '../appUser/appUser.component'
+import { store } from '../../store'                                
+                                `
+                            },
+                            {
+                                text:'Observe que dentro da factory appUser, definimos o state local do componente e registramos appUser como filho de appUserList.',
+                                code: `
+const state = {
+    userList: store.get().userList
+}
+
+const children = () => ({
+    appUser
+})                                
+                                `
+                            },
+                            {
+                                text: 'Na sequeência, através do hooks beforeOnInit o componente se inscreve para ouvir mudanças na store através do método subscribe da própria store.',
+                                code: `
+const hooks = ({ state, methods }) => ({
+    beforeOnInit() {
+        store.subscribe(({ search }) => {
+            const userList = search?.userList
+            const hasChanges = methods.hasChanges(state.get().userList, userList)
+            if (hasChanges && userList) state.set({userList})
+        })
+    }
+})                                 
+                                `
+                            },
+                            {
+                                text: 'O código acima garante que o componente será atualizado somente quando o state local for diferente da store.'
+                            },
+                            {
+                                text:'A comparação entre estado local e store só é possíve, por causa da factoryMethods que devolve um objeto contendo os métodos do componete. Esse objeto foi acessado no hook beforeOnInit. Veja abaixo:',
+                                code: `
+const methods = ({props, state}) => ({
+    
+    hasChanges (oldState, newState) {
+        const oldStateJson = JSON.stringify(oldState)
+        const newStateJson = JSON.stringify(newState)
+        return oldStateJson !== newStateJson
+    },
+
+})                                
+                                `
+                            },
+                            {
+                                text:'O componente appUserList está concluído. Mas, ainda é ncessário criar o componente appUser registrado como filho de appUserList, caso contrário a aplicação vai quebrar.'
+                            },
+                            {
+                                text:'A partir de agora, implementaremos o componente appUser.'
+                            },
+                            {
+                                text:'Na pasta components crie a pasta appUser e dentro dela os arquivos:',
+                                code:`
+appUser.component.js
+appUser.template.js
+appUser.styles.js                                
+                                `
+                            }
                         ]
                     }
                 ]
