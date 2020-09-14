@@ -958,7 +958,7 @@ export {
                             {
                                 text:'Perceba que apenas importamos o template e os estilos dentro de appTitle.component.js, e os retornamos através da factory appTitle. Por fim, expotamos a função construtora appTitle que agora pode ser importada pelo componente appHome.',
                                 code:`
-//appHome.compnente.js
+//appHome.componente.js
 
 import template from './appHome.template'
 import styles from './appHome.styles'
@@ -2476,12 +2476,978 @@ export default ({props, state, methods}) => {
                                 `
                             },
                             {
-                                text:'O template é muito parecido com o template do componente appMovie, com 3 diferenças, primeiro os dados de usuário são manipulados por méthods com o prefixo user, os métodos getFullName e setCpf são específicos para esse componente e por fim, o template espera o componente appLink para ser renderizado. Tirando isso não tem muita diferença.'
+                                text:'No trecho abaixo, o template obtem o id do cliente/usuário e define uma função que verifica se deve ou não exibir botões de controle.',
+                                code: `
+const userId = props.object.userId
+const notHaveButtons = () => props.object.hideButtons && props.object.hideButtons === true                                
+                                `
+                            }, 
+                            {
+                                text:'Na sequência é definido o fragmento de template que adiciona os botões de controle de acordo com a funçao de verificação definida anteriormente.',
+                                code: `
+    const buttonsTpl = () => {
+        if (notHaveButtons()) return ''
+        return /*html*/ \`
+            <div class="user-buttons">
+                <app-link data-props="{'hash': '#/user/\${props.object.userId}', 'label':'Histórico'}"></app-link>
+                <app-mark-to data-props="{'type':'user', 'userId': '\${userId}'}"></app-mark-top>
+            </div>        
+        \`
+    }                                
+                                `
+                            },
+                            {
+                                text:'No trecho acima, buttonsTpl faz uso de um componente extra "appLink" que deve redirecionar para uma rota contendo o id do usuário se for clicado.'
+                            },
+                            {
+                                text:'Por fim, como pode ver abaixo, o template exibe os dados do do usuário/cliente e verifica se o mesmo está marcado para uma operação de locação. Caso esteja, o template do usuário/cliente é destaco.',
+                                code: `
+    return /*html*/ \`
+    <div class="user-wrapper \${methods.isSelected(userId) && !notHaveButtons() ? 'selected' : ''}">
+        <div class="user-name"> \${methods.getFullName(userId)}</div>
+        <div class="user-cpf">CPF: \${state.cpf}</div>
+        \${buttonsTpl()}
+    </div>\`                                
+                                `
+                            },
+                            {
+                                text:'O próximo passo agora é implementar os estilos do componente.',
+                                code: `
+/*appUser.styles.js*/
+
+export default () => /*css*/ \`
+    app-user .user-wrapper {
+        display:block;
+        float:left;
+        width:100%;
+        padding:15px;
+        margin-bottom:15px;
+        border-radius:4px;
+        border:1px #f7f6f8 solid;
+        background:#fff;
+        box-shadow: 3px 3px 3px #f4f3f6;
+        text-align:left;
+    }
+
+    app-user .selected {border-color:#2ad58e}
+
+    app-user .user-name,
+    app-user .user-cpf {
+        display:block;
+        float:left;
+        width:100%;
+        padding-bottom: 15px;
+        border-bottom:1px #ebebeb solid;
+        margin-bottom:15px;
+    }
+
+    app-user .user-name {
+        font-weight:700;
+        margin-bottom:0;
+        border-bottom:none;
+    }
+    
+    app-user .user-name,
+    app-user .user-cpf {
+        display:block;
+        float:left;
+        width:100%;
+        padding-bottom: 15px;
+        border-bottom:1px #ebebeb solid;
+        color:#666;
+        font-size:1em;
+        text-transform:uppercase;
+        line-height:1.5em;
+    }
+
+    app-user .user-cpf {
+        text-transform: none;
+        padding-top:15px;
+    }    
+
+    app-user .user-buttons {
+        display:block;
+        float:left;
+        width:100%;
+        text-align:right;
+    }
+
+\`
+
+                                `
+                            },
+                            {
+                                text:'Por fim, você deve implementar o código abaixo para o componente:',
+                                code: `
+import styles from './appUser.styles'
+import template from './appUser..template'
+
+import { appLink } from '../appLink/appLink.component'
+import { appMarkTo } from '../appMarkTo/appMarkTo.component'
+
+import { store } from '../../store'
+
+const appUser = () => {
+
+    const state = {
+        cpf:'',
+        fullName:'',
+        selected: false,
+        userList: store.get().userList,
+    }
+
+    const children = () => ({
+        appLink,
+        appMarkTo
+    })
+
+    const hooks = ({methods}) => ({
+
+        beforeOnInit () {
+            store.subscribe((payload) => {
+                methods.userInOperation(payload) ? methods.selectUser() : methods.unselectUser()
+            })
+        },
+
+        afterOnInit () {
+            
+            methods.setCpf()
+        }
+
+    })
+
+    const methods = ({props, state}) => ({
+        
+        setCpf () {
+            const {userId} = props.get().object
+            const {userList} = state.get()
+            const {cpf} = userList.find( user => +user.id === +userId)
+            state.set({cpf})
+        },
+
+        getFullName (userId) {
+            const { userList } = state.get()
+            const user = userList.find( user => +user.id === +userId)
+            return \`\${ user.name } \${ user.lastName }\`
+        },
+
+        isSelected (userId) {
+            const { operation } = store.get()
+            return (operation.client !== null && +operation.client.id === +userId)
+        },
+
+        selectUser () {
+            state.set({selected: true})
+        },
+        unselectUser () {
+            state.set({ selected: false })
+        },
+
+        userInOperation(dataStore) {
+            const { operation } = dataStore
+            const { object } = props.get()
+            return operation.client !== null && +operation.client.id === +object.userId
+        }
+
+    })
+
+    return {
+        state,
+        template,
+        styles,
+        children,
+        hooks,
+        methods
+    }
+}
+
+export { appUser }                                
+                                `
+                            },
+                            {
+                                text:'Primeiro, foram importadas as dependências do componente. Inclusive, appLink que ainda não foi criado. Faremos isso logo a seguir.',
+                                code: `
+import styles from './appUser.styles'
+import template from './appUser..template'
+
+import { appLink } from '../appLink/appLink.component'
+import { appMarkTo } from '../appMarkTo/appMarkTo.component'
+
+import { store } from '../../store'                                
+                                `
+                            },
+                            {
+                                text:'No trecho de código abaixo, o state local foi declarado e os componentes filhos registrados.',
+                                code:`
+    const state = {
+        cpf:'',
+        fullName:'',
+        selected: false,
+        userList: store.get().userList,
+    }
+
+    const children = () => ({
+        appLink,
+        appMarkTo
+    })                                
+                                `
+                            },
+                            {
+                                text: 'Esse componente faz uso de dois hooks.'
+                            },
+                            {
+                                text:'Primeiro, beforeOnInit para observar mudanças na store de dados.'
+                            },
+                            {
+                                text:'O segundo hooks utilizado foi afterOnInit. Assim, logo que o componente é inicializado o cpf do cliente é definido no state local através da execução do método setCpf.',
+                                code: `
+    const hooks = ({methods}) => ({
+
+        beforeOnInit () {
+            store.subscribe((payload) => {
+                methods.userInOperation(payload) ? methods.selectUser() : methods.unselectUser()
+            })
+        },
+
+        afterOnInit () {
+            
+            methods.setCpf()
+        }
+
+    })                                
+                                `
+                            },
+                            {
+                                text:'Então, os métodos usados no template e nos hooks são declarados.',
+                                code:`
+    const methods = ({props, state}) => ({
+        
+        setCpf () {
+            const {userId} = props.get().object
+            const {userList} = state.get()
+            const {cpf} = userList.find( user => +user.id === +userId)
+            state.set({cpf})
+        },
+
+        getFullName (userId) {
+            const { userList } = state.get()
+            const user = userList.find( user => +user.id === +userId)
+            return \`\${ user.name } \${ user.lastName }\`
+        },
+
+        isSelected (userId) {
+            const { operation } = store.get()
+            return (operation.client !== null && +operation.client.id === +userId)
+        },
+
+        selectUser () {
+            state.set({selected: true})
+        },
+
+        unselectUser () {
+            state.set({ selected: false })
+        },
+
+        userInOperation(dataStore) {
+            const { operation } = dataStore
+            const { object } = props.get()
+            return operation.client !== null && +operation.client.id === +object.userId
+        }
+
+    })                                
+                                `
+                            },
+                            {
+                                text:'Como esse componente depende de appLink e appLink ainda não foi criado, faremos isso agora.',
+                            },
+                            {
+                                text:'Crie uma pasta appLink dentro da pasta componentes e dentro da pasta os três arquivos abaixo:',
+                                code:`
+appLink.component.js
+appLink.template.js
+appLink.styles.js                                
+                                `
+                            },
+                            {
+                                text:'App link é um componente muito simples. Tudo que ele faz é exibir um texto no botão e redirecinar para a rota passada através de suas propriedades reativas. Veja abaixo:',
+                                code:`
+/*appLink.template.js*/
+
+export default ({ props, state }) => /*html*/ \`
+    <div class="link-wrapper">
+        <a href="\${props.object.hash}" class="link">
+            <i class="las la-plus"></i> \${props.object.label}
+        </a>    
+    </div>
+\`                                
+                                `
+                            },
+                            {
+                                text:'O css desse componente também é bem simples:',
+                                code:`
+/*appLink.styles.js*/
+
+export default () => /*css*/ \`
+    app-link .link-wrapper {
+        display:inline-block;
+    }
+
+    app-link .selected {border-color:#2ad58e}    
+    
+    app-link .link {
+        display:block;
+        float:left;
+        width:100%;
+        padding:10px 15px;
+        border-radius:4px;
+        font-size: .875em;
+        text-align:center;
+        border:1px #fff solid;
+        color:#d2cad8;
+        background:#f7f7f8;
+        text-decoration:none;
+        outline:none;
+        transition:.2s ease-in
+    }
+
+    app-link .link:hover {
+        border:1px #2ad58e solid;
+        color:#2ad58e;
+        background:#fff;
+    }
+\`
+                                `
+                            },
+                            {
+                                text:'O css utilizado poderia ser usado para formatar o comportamento visual de qualquer botão html.'
+                            },
+                            {
+                                text:'Por fim, a implementação do componente.',
+                                code:`
+/*appLink.componente.js*/
+
+import template from './appLink.template'
+import styles from './appLink.styles'
+
+const appLink = () => {
+
+    return {
+        template,
+        styles
+    }
+
+}
+
+export { appLink }
+                                `
+                            },
+                            {
+                                text:'Veja que o componente só junta tudo em uma peça e é exportado para ser reusado quantas vezes necessarias.'
+                            },
+                            {
+                                text:'Como o componente que acabou de ser criado já foi previamente importado por appUser. Não há mais o que fazer. Então vai lá, pode testar a aplicação.'
+                            }
+                        ]
+                    },
+                    {
+                        title:'Gerenciando operações de locação.',
+                        paragraphs:[
+                            {
+                                text:'Na sessão anterior concluímos os componentes para exibição dos filmes e clientes registrados na aplicação. Porém, as operações de locação ainda não estão sendo administradas. Faremos isso agora.'
+                            },
+                            {
+                                text:'Para gerenciar as operações de locação, será necessário criar um componente novo e reutilizar appUser e appMovie. Some uma operação pode ser realizada por vez e somente um filme e um cliente pode ser registrado para cada operação.'
+                            },
+                            {
+                                text:'Na pasta componentes crie a pasta appSidebar e dentro dela os arquivos:',
+                                code:`
+appSidebar.component.js
+appSidebar.template.js
+appSidebar.styles.js                                
+                                `
+                            },
+                            {
+                                text:'Para facilitar o entendimento, dessa vez comece implementando o compontent:',
+                                code: `
+/*appSidebar.component.js*/
+
+import template from './appSidebar.template'
+import styles from './appSidebar.styles'
+
+import { appUser } from '../appUser/appUser.component'
+import { appMovie } from '../appMovie/appMovie.component'
+import { store } from '../../store'
+
+const appSidebar = () => {
+
+    const state = {
+        client: null,
+        movie: null,
+        showSidebar: false
+    }
+
+    const children = () => ({
+        appUser,
+        appMovie
+    })
+
+    const hooks = ({state, methods}) => ({
+        beforeOnInit () {
+            store.subscribe((dataStore) => {
+                const { client, movie } = dataStore.operation
+                let showSidebar = methods.hasClientAndMovie()
+                state.set({client, movie, showSidebar})
+            })
+        }
+    })
+
+    const events = ({query, on, methods}) => ({
+        onClickToCancel () {
+            const btnCancel = query('.btn-cancel')
+            if(!btnCancel) return
+            on('click', [btnCancel], methods.clearOperation)
+        },
+
+        onClickToConfirm () {
+            const btnSuccess = query('.btn-success')
+            if(!btnSuccess) return
+            on('click', [btnSuccess], methods.saveOperation)
+        }
+    })
+
+    const methods = ({props, state}) => ({
+
+        clearOperation () {
+            store.update((dataStore) => {
+                dataStore.operation = {client:null, movie:null}
+            })
+        },
+
+        saveOperation () {
+            store.update((dataStore) => {
+                const {movie, client} = state.get()
+                const user = dataStore.userList.find( user => +user.id === +client.id)
+                user.movies.push(movie)
+                dataStore.operation = { client: null, movie: null }
+            })
+        },
+    
+        hasClientAndMovie () {
+            const { operation } = store.get()
+            return (operation.client && operation.movie) !== null
+        }
+
+    })
+    return {
+        state,
+        methods,
+        children,
+        hooks,
+        events,
+        template,
+        styles
+    }
+}
+
+export { appSidebar }
+                                `
+                            },
+                            {
+                                text:'No trecho abaixo foram importadas as dependẽncias do componente, inclusive appUser e appMovie que serão reutilizados.',
+                                code: `
+import template from './appSidebar.template'
+import styles from './appSidebar.styles'
+
+import { appUser } from '../appUser/appUser.component'
+import { appMovie } from '../appMovie/appMovie.component'
+import { store } from '../../store'                                
+                                `
+                            },
+                            {
+                                text:'Observe que em seguida o state local foi definido e os componentes filhos de appSidebar foram registrados:',
+                                code:`
+    const state = {
+        client: null,
+        movie: null,
+        showSidebar: false
+    }
+
+    const children = () => ({
+        appUser,
+        appMovie
+    })                                
+                                `
+                            },
+                            {
+                                text:'Nesse outro trecho, o hook beforeOnInit é declarado. O componente se increve para ouvir mudanças nos dados da store. Caso ocorra uma mudança nos dados o componente verifica se existe cliente e filme marcados para uma operação de locação, decide se o sidebar deve ser exibido e atualiza o state local do componente.',
+                                code:`
+    const hooks = ({state, methods}) => ({
+        beforeOnInit () {
+            store.subscribe((dataStore) => {
+                const { client, movie } = dataStore.operation
+                let showSidebar = methods.hasClientAndMovie()
+                state.set({client, movie, showSidebar})
+            })
+        }
+    })                                
+                                `
+                            },
+                            {
+                                text:'Note que o operado do app precisa de uma forma para poder cancelar e salvar locações. O trecho abaixo adiciona dois eventos que permitem essa interação.',
+                                code:`
+    const events = ({query, on, methods}) => ({
+        onClickToCancel () {
+            const btnCancel = query('.btn-cancel')
+            if(!btnCancel) return
+            on('click', [btnCancel], methods.clearOperation)
+        },
+
+        onClickToConfirm () {
+            const btnSuccess = query('.btn-success')
+            if(!btnSuccess) return
+            on('click', [btnSuccess], methods.saveOperation)
+        }
+    })                                
+                                `
+                            },
+                            {
+                                text:'O manipulador de eventos onClicToCacel, registra um evento de click no botão cancelar e caso esse botão sejá clicada a operação de locação será removida pelo método clearOperation.'
+                            },
+                            {
+                                text:'No caso do manipulador onClickToConfirm, é registrado um evento de click e caso o botão de confirmação seja clicado o método save operation adiconará um filme na lista de filmes locados do cliente através do método saveOperation.',
+                            },
+                            {
+                                text:'Por fim, os métodos usados nos hooks, eventos e template são declarados.',
+                                code: `
+const methods = ({props, state}) => ({
+
+        clearOperation () {
+            store.update((dataStore) => {
+                dataStore.operation = {client:null, movie:null}
+            })
+        },
+
+        saveOperation () {
+            store.update((dataStore) => {
+                const {movie, client} = state.get()
+                const user = dataStore.userList.find( user => +user.id === +client.id)
+                user.movies.push(movie)
+                dataStore.operation = { client: null, movie: null }
+            })
+        },
+    
+        hasClientAndMovie () {
+            const { operation } = store.get()
+            return (operation.client && operation.movie) !== null
+        }
+
+    })
+                                    
+                                `
+                            },
+                            {
+                                text:'Existem dois pontos importantíssimos que precisam de mais detalhes. O primeiro é o cancelamento de operações de locação. Veja abaixo:',
+                                code:`
+        clearOperation () {
+            store.update((dataStore) => {
+                dataStore.operation = {client:null, movie:null}
+            })
+        }                                
+                                `
+                            },
+                            {
+                                text:'Esse trecho de código define indiscriminadamente as propriedades client e movie da chave operation da store como nulas. Isso garante que a operação está cancelada.'
+                            },
+                            {
+                                text:'Outro ponto importante trata da confirmação da operação. Veja a seguir:',
+                                code:`
+        saveOperation () {
+            store.update((dataStore) => {
+                const {movie, client} = state.get()
+                const user = dataStore.userList.find( user => +user.id === +client.id)
+                user.movies.push(movie)
+                dataStore.operation = { client: null, movie: null }
+            })
+        }                                
+                                `
+                            },
+                            {
+                                text:'Nesse trecho de código, a função saveOperation obtem os dados de clientes e filmes extraíndo-os do state local. Em seguida, a função procura pelo usuário/cliente selecionado e o salva na variável user. Por fim, o filme extraído do state local é inserido na propriedade movies do usuário/cliente selecionado e a operação então é definida como nula o que possíbilita uma nova operação de locação no futuro.'
+                            },
+                            {
+                                text: 'Por fim, o componente é exportado',
+                                code: `
+/*codigo omitido*/
+
+const appSidebar = () => {
+    /*codigo omitido*/
+}
+
+export { appSidebar }
+                        `
+                            },
+                            {
+                                text:'Agora será necesário importar o componente appSidebar em appHome e a aparência de appHome ficará assim:',
+                                code:`
+/*appHome.component.js*/
+
+import template from './appHome.template'
+import styles from './appHome.styles'
+
+import { appTitle } from '../appTitle/appTitle.component'
+import { appMovieList } from '../appMovieList/appMovieList.component'
+import { appUserList } from '../appUserList/appUserList.component'
+import { appSearch } from '../appSearch/appSearch.component'
+import { appSidebar } from '../appSidebar/appSidebar.component'
+
+import { store } from '../../store'
+
+const appHome = () => {
+
+    const children = () => ({
+        appTitle,
+        appMovieList,
+        appUserList,
+        appSearch,
+        appSidebar
+    })
+
+    return {
+        template,
+        styles,
+        children,
+    }
+    
+}
+
+export { appHome }
+                                `
+                            }                           
+                        ]
+                    }
+                ]
+            },
+            {
+                title:'Histórico de filmes locados.',
+                tagline:'Muito mais produtividade com muito menos complexidade',
+                articles:[
+                    {
+                        title:'Detalhes do usuário',
+                        paragraphs:[
+                            {
+                                text:'Para concluir a aplicação será necessário criar um último componente que exiba os filmes locados por cada usuário/cliente.'
+                            },
+                            {
+                                text:'Dentro da pasta components, crie a pasta appUserDetail e dentro dela os arquivos abaixo:',
+                                code:`
+appUserDetail.component.js                                
+appUserDetail.template.js                                
+appUserDetail.styles.js                                
+                                `
+                            },
+                            {
+                                text:'Comece implementando o compoente:',
+                                code:`
+import template from './appUserDetail.template'
+import styles from './appUserDetail.styles'
+
+import { store } from '../../store'
+import { appUser } from '../appUser/appUser.component'
+import { appMovie } from '../appMovie/appMovie.component'
+import { appTitle } from '../appTitle/appTitle.component'
+import { appLink } from '../appLink/appLink.component'
+
+const appUserDetail = () => {
+
+    const state = {
+        user: null
+    }
+    
+    const children = () => ({ 
+        appMovie,
+        appTitle,
+        appLink,
+        appUser
+    })
+
+    const hooks = ({methods}) => ({
+       
+        beforeOnInit () {
+            methods.getUserById()
+        }
+
+    })
+
+    const methods = ({props, state}) => ({
+
+        getHashId () {
+            return +window.location.hash.split('/').pop()
+        },
+
+        getUserById () {
+            const userId = this.getHashId()
+            const user = store.get().userList.find( user => user.id === userId)
+            state.set({ user })
+        }
+
+    })
+
+    return {
+        template,
+        styles,
+        methods,
+        hooks,
+        children
+    }
+
+}
+
+export { appUserDetail }                                
+                                `
+                            },
+                            {
+                                text:'No trecho abaixo, todas as dependências do componente são importadas.',
+                                code:`
+import template from './appUserDetail.template'
+import styles from './appUserDetail.styles'
+
+import { store } from '../../store'
+import { appUser } from '../appUser/appUser.component'
+import { appMovie } from '../appMovie/appMovie.component'
+import { appTitle } from '../appTitle/appTitle.component'
+import { appLink } from '../appLink/appLink.component'                                
+                                `
+                            },
+                            {
+                                text:'Observe que o componente appUserDetail reaproveita appUser, appMovie, appTitle para exibir as informações necessárias.'
+                            },
+                            {
+                                text:'appUserDetail também permitirá a navegação entre as páginas através do componente appLink.'
+                            },
+                            {
+                                text:'No trecho a seguir, o state local é declarado e os componentes filhos registrados.',
+                                code:`
+    const state = {
+        user: null
+    }
+    
+    const children = () => ({ 
+        appMovie,
+        appTitle,
+        appLink,
+        appUser
+    })                                
+                                `
+                            },
+                            {
+                                text:'Na sequência o componente registra o hook beforeOnInit para obter o id do usuário selecionado para então exibir suas informações na tela.',
+                                code:`
+    const hooks = ({methods}) => ({
+       
+        beforeOnInit () {
+            methods.getUserById()
+        }
+
+    })                                
+                                `
+                            },
+                            {
+                                text:'Observe que appUserDetail registra duas funções apenas. A primeira é getHashId que obtém o id do usuário/cliente através do hash na url da página e a segunda é getUserById que recupera o usuário na store de dados através do id de usuário obtido por getHashId.',
+                                code:`
+    const methods = ({props, state}) => ({
+
+        getHashId () {
+            return +window.location.hash.split('/').pop()
+        },
+
+        getUserById () {
+            const userId = this.getHashId()
+            const user = store.get().userList.find( user => user.id === userId)
+            state.set({ user })
+        }
+
+    })                                
+                                `
+                            },
+                            {
+                                text:'Por fim, a função fabrica retorna as propriedades do compoenente e é exportada:',
+                                code:`
+/*codigo omitido*/
+
+const appUserDetail = () => {
+    
+    /*codigo omitido*/
+
+    return {
+        template,
+        styles,
+        methods,
+        hooks,
+        children
+    }
+
+}
+
+export { appUserDetail }                                
+                                `
+                            },
+                            {
+                                text:'Hora de definir o template do componente:',
+                                code: `
+/*appUserDetail.template.js*/
+
+export default ({props, state}) => {
+    const repeat = (template, dataArr) => {
+        return dataArr.map(item => template(item)).join('')
+    }
+
+    const movieTpl = (movie) => /*html*/ \`
+        <div class="grid">
+            <app-movie data-props="{'movieId': '\${movie.id}', 'hideButtons':true}"></app-movie>
+        </div>
+    \`   
+
+    return /*html*/ \`
+        <div class="detail-wrapper">
+        <app-title data-props="{'title':'Hitórico de locações', 'style':'purple'}"></app-title>
+            <div class="content">
+                <div class="row">
+                    <app-link data-props="{'hash': '#/', 'label':'Voltar'}"></app-link>
+                </div>
+                <div class="row">
+                    <app-title data-props="{'title':'Dados do cliente', 'style':'white'}"></app-title>
+                </div>
+                <div class="row">
+                    <app-user data-props="{'userId': '\${state.user.id}', 'hideButtons':true}"></app-user>
+                </div>
+                <div class="row">
+                    <app-title data-props="{'title':'Histórico de locação', 'style':'white'}"></app-title>
+                </div>
+                \${repeat(movieTpl, state.user.movies)}    
+            </div>
+        </div>
+    \`
+
+}
+                                `
+                            },
+                            {
+                                text:'No trecho abaixo, é definido o fragmento de template movieTpl que faz uso do componente appMovie e que será repetido de acordo com a lista de filmes alugada pelo usuário/clente. Isso só é possível porque appMovie recebe atraves da propriedade reativa movieId o id do filme a ser listado.',
+                                code:`
+    const movieTpl = (movie) => /*html*/ \`
+        <div class=”grid”>
+            <app-movie data-props=”{'movieId': '$\{movie.id}', 'hideButtons':true}”></app-movie>
+        </div>
+    \`                                 
+                                `
+                            },
+                            {
+                                text:'Por fim, todos os componentes filhos utilizados pelo template recebem através de propriedades reativas as informações das quais dependem. Inclusive, appUser que exibe os dados do usuário, também faz uso desse recurso.',
+                                code:`
+    return /*html*/ \`
+        <div class="detail-wrapper">
+        <app-title data-props="{'title':'Hitórico de locações', 'style':'purple'}"></app-title>
+            <div class="content">
+                <div class="row">
+                    <app-link data-props="{'hash': '#/', 'label':'Voltar'}"></app-link>
+                </div>
+                <div class="row">
+                    <app-title data-props="{'title':'Dados do cliente', 'style':'white'}"></app-title>
+                </div>
+                <div class="row">
+                    <app-user data-props="{'userId': '\${state.user.id}', 'hideButtons':true}"></app-user>
+                </div>
+                <div class="row">
+                    <app-title data-props="{'title':'Histórico de locação', 'style':'white'}"></app-title>
+                </div>
+                \${repeat(movieTpl, state.user.movies)}    
+            </div>
+        </div>
+    \`                                
+                                `
+                            },
+                            {
+                                text:'Hora de implementar os estilos do componente.',
+                                code:`
+/*appUserDetail.styles.js*/
+
+export default () => /*css*/ \`
+    app-user-detail .detail-wrapper {
+        display:block;
+        float:left;
+        width:100%;
+        padding:15px;
+    }
+
+    app-user-detail .content {
+        display:block;
+        width:100%;
+        max-width:1180px;
+        margin:0 auto;
+    }
+
+    app-user-detail .grid {
+        display:block;
+        float:left;
+        width:33.333%;
+        padding:15px 15px 0 15px;
+    }
+
+    app-user-detail .row {
+        display:block;
+        float:left;
+        width:100%;
+        padding:15px;
+        text-align:right;
+    }
+
+\`                                
+                                `
+                            },
+                            {
+                                text:'CSS aplicado! Temos concluído o componente appUserDetail. Mas, ainda resta importá-lo nas rotas de navegação para que tudo funcione corretamente.',
+                                code:`
+/*main.js*/
+
+/*codigo omitido*/
+
+import { appUserDetail } from './components/appUserDetail/appUserDetail.component'
+
+/*codigo omitido*/
+
+const routes = {
+    firstRoute: { hash: '#/', component: appHome },
+    defaultRoute: { hash: '#/404', component: appNotFound },
+    otherRoutes: [
+        { hashExp: /^\#\/$/, component: appHome },
+        { hashExp: /^\#\/user\/\d+$/, component: appUserDetail },
+    ]
+}
+
+/*codigo omitido*/
+                                `
+                            },
+                            {
+                                text:'Finalmente conluímos a aplicação. Pode ir lá testar!'
+                            }
+                        ]
+                    },
+                ]
+            },
+            {
+                title:'Conclusão',
+                tagline:'Padrões e reatividade com factory functions',
+                articles:[
+                    {
+                        title:'Conceitos abordados',
+                        paragraphs:[
+                            {
+                                text:'Até aqui você já aprendeu os principais conceitos e recursos de r9x. Você já viu como é rápido construir aplicações com r9x. Tudo que precisa fazer agora é seguir praticando. Boa sorte!'
                             }
                         ]
                     }
                 ]
-            },            
+            }            
         ]
     }
 })
