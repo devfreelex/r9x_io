@@ -14,6 +14,8 @@ import '../../assets/editor.theme.css'
 
 const appCode = () => {
 
+    const tagName = 'app-code'
+
     const hooks = ({ methods }) => ({
         afterOnInit () {
             methods.initHighlight()
@@ -54,6 +56,7 @@ const appCode = () => {
     })
 
     return { 
+        tagName,
         styles,
         template,
         hooks,

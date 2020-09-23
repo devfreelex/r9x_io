@@ -8,6 +8,8 @@ import { appCode } from '../appCode/appCode.component'
 
 const appView = () => {
 
+    const tagName = 'app-view'
+
     const state = store.get()
 
     const children = () => ({
@@ -39,6 +41,7 @@ const appView = () => {
     })
 
     return {
+        tagName,
         state,
         template,
         styles,

@@ -8,6 +8,8 @@ import { appView } from '../appView/appView.component'
 
 const appHome = () => {
 
+    const tagName = 'app-home'
+
     const state = store.get().introduction
 
     const children = () => ({
@@ -17,6 +19,7 @@ const appHome = () => {
 
 
     return {
+        tagName,
         state,
         template,
         styles,

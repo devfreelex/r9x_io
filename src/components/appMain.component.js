@@ -3,6 +3,8 @@ import {appHeader} from './appHeader/appHeader.component'
 
 const appMain = () => {
 
+    const tagName = 'app-main'
+
     const children = () => ({
         appHeader
     })
@@ -34,6 +36,7 @@ const appMain = () => {
     })
 
     return {
+        tagName,
         template,
         styles,
         hooks,

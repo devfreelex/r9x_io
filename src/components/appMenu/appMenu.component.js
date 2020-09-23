@@ -2,6 +2,8 @@ import styles from './appMenu.styles'
 import template from './appMenu.template'
 
 const appMenu = () => {
+    
+    const tagName = 'app-menu'
 
     const state = {
         menuList: [
@@ -13,6 +15,7 @@ const appMenu = () => {
     }
 
     return {
+        tagName,
         state,
         styles,
         template

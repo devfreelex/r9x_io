@@ -7,6 +7,8 @@ import { store } from '../../../store'
 
 const appTutorial = () => {
 
+    const tagName = 'app-tutorial'
+
     const state = store.get()
 
     const children = () => ({
@@ -15,6 +17,7 @@ const appTutorial = () => {
     })
 
     return {
+        tagName,
         state,
         template,
         styles,
